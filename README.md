@@ -248,15 +248,15 @@ Ensure the following are installed:
 
 # Backend Setup
 
-Navigate to backend directory:
+### Navigate to backend directory:
 
 cd backend
 
-Start PostgreSQL container:
+### Start PostgreSQL container:
 
 docker compose up -d
 
-Create database migration:
+### Create database migration:
 
 dotnet ef migrations add InitialCreate
 --project src/CafeEmployeeManager.Infrastructure
@@ -274,19 +274,19 @@ http://localhost:5000/swagger
 
 # Frontend Setup
 
-Navigate to frontend:
+### Navigate to frontend:
 
 cd frontend
 
-Install dependencies:
+### Install dependencies:
 
 npm install
 
-Run the development server:
+### Run the development server:
 
 npm run dev
 
-Frontend will run at:
+### Frontend will run at:
 
 http://localhost:5173
 
