@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CafeEmployeeManager.Api/CafeEmployeeManager.Api.csproj" />
+    <Project Path="src/CafeEmployeeManager.Application/CafeEmployeeManager.Application.csproj" />
+    <Project Path="src/CafeEmployeeManager.Domain/CafeEmployeeManager.Domain.csproj" />
+    <Project Path="src/CafeEmployeeManager.Infrastructure/CafeEmployeeManager.Infrastructure.csproj" />
+  </Folder>
+</Solution>
