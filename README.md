@@ -37,7 +37,7 @@ The backend follows **Clean Architecture principles**, implements **CQRS with Me
 # Project Structure
 
 gic-cafe-employee-manager
-'''
+```
 backend
  ├─ CafeEmployeeManager.sln
  ├─ docker-compose.yml
@@ -65,7 +65,7 @@ frontend
      ├─ hooks
      ├─ routes
      └─ utils
-'''
+```
 ---
 
 # Backend Architecture
