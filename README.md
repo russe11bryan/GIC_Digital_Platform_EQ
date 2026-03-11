@@ -12,7 +12,6 @@ The backend follows **Clean Architecture principles**, implements **CQRS with Me
 
 ## Backend
 - .NET 8 (ASP.NET Core Web API)
-- Clean Architecture
 - CQRS Pattern
 - MediatR
 - Entity Framework Core
