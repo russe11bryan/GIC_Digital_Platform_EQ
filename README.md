@@ -37,35 +37,35 @@ The backend follows **Clean Architecture principles**, implements **CQRS with Me
 # Project Structure
 
 gic-cafe-employee-manager
+'''
+backend
+ ├─ CafeEmployeeManager.sln
+ ├─ docker-compose.yml
+ └─ src
+     ├─ CafeEmployeeManager.Api
+     │   ├─ Controllers
+     │   └─ Program.cs
+     │
+     ├─ CafeEmployeeManager.Application
+     │   ├─ Cafes
+     │   ├─ Employees
+     │   └─ Common
+     │
+     ├─ CafeEmployeeManager.Domain
+     │   └─ Entities
+     │
+     └─ CafeEmployeeManager.Infrastructure
+         └─ Persistence
 
-backend\
- ├─ CafeEmployeeManager.sln\
- ├─ docker-compose.yml\
- └─ src\
-     ├─ CafeEmployeeManager.Api\
-     │   ├─ Controllers\
-     │   └─ Program.cs\
-     │\
-     ├─ CafeEmployeeManager.Application\
-     │   ├─ Cafes\
-     │   ├─ Employees\
-     │   └─ Common\
-     │\
-     ├─ CafeEmployeeManager.Domain\
-     │   └─ Entities\
-     │\
-     └─ CafeEmployeeManager.Infrastructure\
-         └─ Persistence\
-\
-frontend\
- └─ src\
-     ├─ pages\
-     ├─ components\
-     ├─ api\
-     ├─ hooks\
-     ├─ routes\
-     └─ utils\
-\
+frontend
+ └─ src
+     ├─ pages
+     ├─ components
+     ├─ api
+     ├─ hooks
+     ├─ routes
+     └─ utils
+'''
 ---
 
 # Backend Architecture
