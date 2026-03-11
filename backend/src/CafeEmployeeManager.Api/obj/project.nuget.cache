@@ -1,12 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "GrwHgcqUjKg=",
+  "dgSpecHash": "XzR1fOyvFK0=",
   "success": true,
   "projectFilePath": "/Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Api/CafeEmployeeManager.Api.csproj",
   "expectedPackageFiles": [
     "/Users/russellbryan/.nuget/packages/autofac/8.1.0/autofac.8.1.0.nupkg.sha512",
     "/Users/russellbryan/.nuget/packages/autofac.extensions.dependencyinjection/10.0.0/autofac.extensions.dependencyinjection.10.0.0.nupkg.sha512",
     "/Users/russellbryan/.nuget/packages/fluentvalidation/12.1.1/fluentvalidation.12.1.1.nupkg.sha512",
+    "/Users/russellbryan/.nuget/packages/fluentvalidation.dependencyinjectionextensions/12.1.1/fluentvalidation.dependencyinjectionextensions.12.1.1.nupkg.sha512",
     "/Users/russellbryan/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
     "/Users/russellbryan/.nuget/packages/mediatr/14.1.0/mediatr.14.1.0.nupkg.sha512",
     "/Users/russellbryan/.nuget/packages/mediatr.contracts/2.0.1/mediatr.contracts.2.0.1.nupkg.sha512",

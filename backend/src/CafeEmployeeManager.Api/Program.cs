@@ -1,4 +1,5 @@
 using Autofac.Extensions.DependencyInjection;
+using CafeEmployeeManager.Api.Middleware;
 using CafeEmployeeManager.Application;
 using CafeEmployeeManager.Infrastructure;
 using CafeEmployeeManager.Infrastructure.Persistence;
@@ -29,6 +30,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 app.MapControllers();

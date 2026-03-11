@@ -1,3 +1,5 @@
+using CafeEmployeeManager.Application.Common.Behaviors;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CafeEmployeeManager.Application;
@@ -6,10 +8,15 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
+        var assembly = typeof(DependencyInjection).Assembly;
+
         services.AddMediatR(config =>
         {
-            config.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly);
+            config.RegisterServicesFromAssembly(assembly);
+            config.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
+
+        services.AddValidatorsFromAssembly(assembly);
 
         return services;
     }
