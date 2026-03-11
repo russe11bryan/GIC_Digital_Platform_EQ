@@ -1,9 +1,10 @@
+using CafeEmployeeManager.Application.Common.Interfaces;
 using CafeEmployeeManager.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CafeEmployeeManager.Infrastructure.Persistence;
 
-public class AppDbContext : DbContext
+public class AppDbContext : DbContext, IAppDbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {

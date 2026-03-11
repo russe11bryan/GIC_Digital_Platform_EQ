@@ -38,34 +38,34 @@ The backend follows **Clean Architecture principles**, implements **CQRS with Me
 
 gic-cafe-employee-manager
 
-backend
- ├─ CafeEmployeeManager.sln
- ├─ docker-compose.yml
- └─ src
-     ├─ CafeEmployeeManager.Api
-     │   ├─ Controllers
-     │   └─ Program.cs
-     │
-     ├─ CafeEmployeeManager.Application
-     │   ├─ Cafes
-     │   ├─ Employees
-     │   └─ Common
-     │
-     ├─ CafeEmployeeManager.Domain
-     │   └─ Entities
-     │
-     └─ CafeEmployeeManager.Infrastructure
-         └─ Persistence
-
-frontend
- └─ src
-     ├─ pages
-     ├─ components
-     ├─ api
-     ├─ hooks
-     ├─ routes
-     └─ utils
-
+backend\
+ ├─ CafeEmployeeManager.sln\
+ ├─ docker-compose.yml\
+ └─ src\
+     ├─ CafeEmployeeManager.Api\
+     │   ├─ Controllers\
+     │   └─ Program.cs\
+     │\
+     ├─ CafeEmployeeManager.Application\
+     │   ├─ Cafes\
+     │   ├─ Employees\
+     │   └─ Common\
+     │\
+     ├─ CafeEmployeeManager.Domain\
+     │   └─ Entities\
+     │\
+     └─ CafeEmployeeManager.Infrastructure\
+         └─ Persistence\
+\
+frontend\
+ └─ src\
+     ├─ pages\
+     ├─ components\
+     ├─ api\
+     ├─ hooks\
+     ├─ routes\
+     └─ utils\
+\
 ---
 
 # Backend Architecture
@@ -262,11 +262,11 @@ dotnet ef migrations add InitialCreate
 --project src/CafeEmployeeManager.Infrastructure
 --startup-project src/CafeEmployeeManager.Api
 
-Run the API:
+### Run the API:
 
 dotnet run --project src/CafeEmployeeManager.Api
 
-Swagger will be available at:
+### Swagger will be available at:
 
 http://localhost:5000/swagger
 

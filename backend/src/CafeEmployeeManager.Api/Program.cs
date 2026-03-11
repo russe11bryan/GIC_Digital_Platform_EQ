@@ -1,4 +1,5 @@
 using Autofac.Extensions.DependencyInjection;
+using CafeEmployeeManager.Application;
 using CafeEmployeeManager.Infrastructure;
 using CafeEmployeeManager.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
