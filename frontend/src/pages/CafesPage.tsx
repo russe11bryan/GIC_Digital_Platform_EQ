@@ -141,7 +141,7 @@ export function CafesPage() {
             <AgGridReact<Cafe>
               rowData={cafesQuery.data ?? []}
               columnDefs={columnDefs}
-              rowSelection={{ mode: 'singleRow' }}
+              rowSelection="single"
               loading={cafesQuery.isFetching}
               onRowClicked={(event) => setSelectedCafe(event.data ?? null)}
             />

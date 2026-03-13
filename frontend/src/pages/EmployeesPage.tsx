@@ -165,7 +165,7 @@ export function EmployeesPage() {
             <AgGridReact<Employee>
               rowData={employeesQuery.data ?? []}
               columnDefs={columnDefs}
-              rowSelection={{ mode: 'singleRow' }}
+              rowSelection="single"
               loading={employeesQuery.isFetching}
               onRowClicked={(event) => setSelectedEmployee(event.data ?? null)}
             />
