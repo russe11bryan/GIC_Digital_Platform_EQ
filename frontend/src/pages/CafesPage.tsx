@@ -1,13 +1,15 @@
 import { PlusOutlined } from '@ant-design/icons'
-import { Alert, Button, Card, Input, Modal, Space, Typography } from 'antd'
+import { App, Alert, Button, Card, Empty, Input, Modal, Space, Spin, Statistic, Typography } from 'antd'
 import type { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import { useMemo, useState } from 'react'
 import { CafeFormModal } from '../components/CafeFormModal'
 import { useCafes, useCreateCafe, useDeleteCafe, useUpdateCafe } from '../hooks/useCafes'
 import type { Cafe, CreateCafePayload, UpdateCafePayload } from '../types/models'
+import { getErrorMessage } from '../utils/getErrorMessage'
 
 export function CafesPage() {
+  const { message } = App.useApp()
   const [locationFilter, setLocationFilter] = useState('')
   const [appliedLocationFilter, setAppliedLocationFilter] = useState('')
   const [selectedCafe, setSelectedCafe] = useState<Cafe | null>(null)
@@ -29,14 +31,29 @@ export function CafesPage() {
     [],
   )
 
+  const totalEmployees = useMemo(
+    () => (cafesQuery.data ?? []).reduce((sum, cafe) => sum + cafe.employees, 0),
+    [cafesQuery.data],
+  )
+
   const handleCreate = async (payload: CreateCafePayload | UpdateCafePayload) => {
-    await createCafeMutation.mutateAsync(payload as CreateCafePayload)
-    setCreateOpen(false)
+    try {
+      await createCafeMutation.mutateAsync(payload as CreateCafePayload)
+      message.success('Cafe created successfully')
+      setCreateOpen(false)
+    } catch (error) {
+      message.error(getErrorMessage(error))
+    }
   }
 
   const handleUpdate = async (payload: CreateCafePayload | UpdateCafePayload) => {
-    await updateCafeMutation.mutateAsync(payload as UpdateCafePayload)
-    setEditOpen(false)
+    try {
+      await updateCafeMutation.mutateAsync(payload as UpdateCafePayload)
+      message.success('Cafe updated successfully')
+      setEditOpen(false)
+    } catch (error) {
+      message.error(getErrorMessage(error))
+    }
   }
 
   const handleDelete = () => {
@@ -50,8 +67,13 @@ export function CafesPage() {
       okText: 'Delete',
       okButtonProps: { danger: true },
       onOk: async () => {
-        await deleteCafeMutation.mutateAsync(selectedCafe.id)
-        setSelectedCafe(null)
+        try {
+          await deleteCafeMutation.mutateAsync(selectedCafe.id)
+          message.success('Cafe deleted successfully')
+          setSelectedCafe(null)
+        } catch (error) {
+          message.error(getErrorMessage(error))
+        }
       },
     })
   }
@@ -61,6 +83,15 @@ export function CafesPage() {
       <Typography.Title level={3} style={{ margin: 0 }}>
         Cafes
       </Typography.Title>
+
+      <Space size={16} wrap>
+        <Card>
+          <Statistic title="Total Cafes" value={(cafesQuery.data ?? []).length} />
+        </Card>
+        <Card>
+          <Statistic title="Assigned Employees" value={totalEmployees} />
+        </Card>
+      </Space>
 
       <Card>
         <Space wrap>
@@ -77,6 +108,9 @@ export function CafesPage() {
           }}>
             Clear
           </Button>
+          <Button onClick={() => void cafesQuery.refetch()} loading={cafesQuery.isFetching && !cafesQuery.isLoading}>
+            Refresh
+          </Button>
           <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
             Add Cafe
           </Button>
@@ -89,18 +123,30 @@ export function CafesPage() {
         </Space>
       </Card>
 
-      {cafesQuery.isError && <Alert type="error" message="Failed to load cafes" showIcon />}
+      {cafesQuery.isError && (
+        <Alert type="error" message="Failed to load cafes" description={getErrorMessage(cafesQuery.error)} showIcon />
+      )}
 
       <Card>
-        <div className="ag-theme-alpine" style={{ height: 460, width: '100%' }}>
-          <AgGridReact<Cafe>
-            rowData={cafesQuery.data ?? []}
-            columnDefs={columnDefs}
-            rowSelection={{ mode: 'singleRow' }}
-            loading={cafesQuery.isLoading}
-            onRowClicked={(event) => setSelectedCafe(event.data ?? null)}
-          />
-        </div>
+        {cafesQuery.isLoading ? (
+          <div className="page-state">
+            <Spin size="large" />
+          </div>
+        ) : (cafesQuery.data ?? []).length === 0 ? (
+          <div className="page-state">
+            <Empty description="No cafes found" />
+          </div>
+        ) : (
+          <div className="ag-theme-alpine" style={{ height: 460, width: '100%' }}>
+            <AgGridReact<Cafe>
+              rowData={cafesQuery.data ?? []}
+              columnDefs={columnDefs}
+              rowSelection={{ mode: 'singleRow' }}
+              loading={cafesQuery.isFetching}
+              onRowClicked={(event) => setSelectedCafe(event.data ?? null)}
+            />
+          </div>
+        )}
       </Card>
 
       <CafeFormModal

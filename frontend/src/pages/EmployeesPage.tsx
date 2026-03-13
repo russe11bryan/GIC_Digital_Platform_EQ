@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons'
-import { Alert, Button, Card, Input, Modal, Space, Typography } from 'antd'
+import { App, Alert, Button, Card, Empty, Input, Modal, Space, Spin, Statistic, Typography } from 'antd'
 import type { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import { useMemo, useState } from 'react'
@@ -7,8 +7,10 @@ import { EmployeeFormModal } from '../components/EmployeeFormModal'
 import { useCafes } from '../hooks/useCafes'
 import { useCreateEmployee, useDeleteEmployee, useEmployees, useUpdateEmployee } from '../hooks/useEmployees'
 import type { CreateEmployeePayload, Employee, UpdateEmployeePayload } from '../types/models'
+import { getErrorMessage } from '../utils/getErrorMessage'
 
 export function EmployeesPage() {
+  const { message } = App.useApp()
   const [cafeFilter, setCafeFilter] = useState('')
   const [appliedCafeFilter, setAppliedCafeFilter] = useState('')
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
@@ -42,13 +44,23 @@ export function EmployeesPage() {
   )
 
   const handleCreate = async (payload: CreateEmployeePayload | UpdateEmployeePayload) => {
-    await createEmployeeMutation.mutateAsync(payload as CreateEmployeePayload)
-    setCreateOpen(false)
+    try {
+      await createEmployeeMutation.mutateAsync(payload as CreateEmployeePayload)
+      message.success('Employee created successfully')
+      setCreateOpen(false)
+    } catch (error) {
+      message.error(getErrorMessage(error))
+    }
   }
 
   const handleUpdate = async (payload: CreateEmployeePayload | UpdateEmployeePayload) => {
-    await updateEmployeeMutation.mutateAsync(payload as UpdateEmployeePayload)
-    setEditOpen(false)
+    try {
+      await updateEmployeeMutation.mutateAsync(payload as UpdateEmployeePayload)
+      message.success('Employee updated successfully')
+      setEditOpen(false)
+    } catch (error) {
+      message.error(getErrorMessage(error))
+    }
   }
 
   const handleDelete = () => {
@@ -62,8 +74,13 @@ export function EmployeesPage() {
       okText: 'Delete',
       okButtonProps: { danger: true },
       onOk: async () => {
-        await deleteEmployeeMutation.mutateAsync(selectedEmployee.id)
-        setSelectedEmployee(null)
+        try {
+          await deleteEmployeeMutation.mutateAsync(selectedEmployee.id)
+          message.success('Employee deleted successfully')
+          setSelectedEmployee(null)
+        } catch (error) {
+          message.error(getErrorMessage(error))
+        }
       },
     })
   }
@@ -75,6 +92,25 @@ export function EmployeesPage() {
       <Typography.Title level={3} style={{ margin: 0 }}>
         Employees
       </Typography.Title>
+
+      <Space size={16} wrap>
+        <Card>
+          <Statistic title="Total Employees" value={(employeesQuery.data ?? []).length} />
+        </Card>
+        <Card>
+          <Statistic
+            title="Average Days Worked"
+            value={
+              (employeesQuery.data ?? []).length === 0
+                ? 0
+                : Math.round(
+                    (employeesQuery.data ?? []).reduce((sum, employee) => sum + employee.daysWorked, 0) /
+                      (employeesQuery.data ?? []).length,
+                  )
+            }
+          />
+        </Card>
+      </Space>
 
       <Card>
         <Space wrap>
@@ -91,10 +127,13 @@ export function EmployeesPage() {
           }}>
             Clear
           </Button>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
+          <Button onClick={() => void employeesQuery.refetch()} loading={employeesQuery.isFetching && !employeesQuery.isLoading}>
+            Refresh
+          </Button>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)} disabled={(cafesQuery.data ?? []).length === 0}>
             Add Employee
           </Button>
-          <Button disabled={!selectedEmployee} onClick={() => setEditOpen(true)}>
+          <Button disabled={!selectedEmployee || !selectedEmployeeCafeId} onClick={() => setEditOpen(true)}>
             Edit Selected
           </Button>
           <Button danger disabled={!selectedEmployee} onClick={handleDelete}>
@@ -103,18 +142,35 @@ export function EmployeesPage() {
         </Space>
       </Card>
 
-      {employeesQuery.isError && <Alert type="error" message="Failed to load employees" showIcon />}
+      {employeesQuery.isError && (
+        <Alert
+          type="error"
+          message="Failed to load employees"
+          description={getErrorMessage(employeesQuery.error)}
+          showIcon
+        />
+      )}
 
       <Card>
-        <div className="ag-theme-alpine" style={{ height: 460, width: '100%' }}>
-          <AgGridReact<Employee>
-            rowData={employeesQuery.data ?? []}
-            columnDefs={columnDefs}
-            rowSelection={{ mode: 'singleRow' }}
-            loading={employeesQuery.isLoading}
-            onRowClicked={(event) => setSelectedEmployee(event.data ?? null)}
-          />
-        </div>
+        {employeesQuery.isLoading ? (
+          <div className="page-state">
+            <Spin size="large" />
+          </div>
+        ) : (employeesQuery.data ?? []).length === 0 ? (
+          <div className="page-state">
+            <Empty description="No employees found" />
+          </div>
+        ) : (
+          <div className="ag-theme-alpine" style={{ height: 460, width: '100%' }}>
+            <AgGridReact<Employee>
+              rowData={employeesQuery.data ?? []}
+              columnDefs={columnDefs}
+              rowSelection={{ mode: 'singleRow' }}
+              loading={employeesQuery.isFetching}
+              onRowClicked={(event) => setSelectedEmployee(event.data ?? null)}
+            />
+          </div>
+        )}
       </Card>
 
       <EmployeeFormModal

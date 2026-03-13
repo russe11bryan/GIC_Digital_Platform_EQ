@@ -17,57 +17,87 @@ If you are developing a production application, we recommend updating the config
 
 ```js
 export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+  # Cafe Employee Manager Frontend
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+  Frontend for the Cafe Employee Manager technical assessment.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+  ## Stack
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+  - React + TypeScript
+  - Vite
+  - Ant Design
+  - AG Grid
+  - TanStack Query
+  - Axios
+  - React Router
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+  ## Features Implemented
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+  - Cafes page with:
+    - location filter
+    - AG Grid listing
+    - create cafe modal
+    - edit selected cafe
+    - delete selected cafe
+    - refresh, loading, empty, and error states
+  - Employees page with:
+    - cafe filter
+    - AG Grid listing
+    - create employee modal
+    - edit selected employee
+    - delete selected employee
+    - refresh, loading, empty, and error states
+  - Mutation feedback with success and error toasts
+
+  ## Getting Started
+
+  Install dependencies:
+
+  ```bash
+  npm install
+  ```
+
+  Start the development server:
+
+  ```bash
+  npm run dev
+  ```
+
+  Build for production:
+
+  ```bash
+  npm run build
+  ```
+
+  ## Backend API
+
+  The frontend expects the backend API to be running at:
+
+  ```text
+  http://localhost:5068/api
+  ```
+
+  You can override this with an environment variable:
+
+  ```bash
+  VITE_API_BASE_URL=http://localhost:5068/api
+  ```
+
+  ## Project Structure
+
+  ```text
+  src/
+    api/          API client and endpoint modules
+    components/   Shared modal forms
+    hooks/        React Query hooks
+    pages/        Route-level pages
+    types/        Shared TypeScript models
+    utils/        Error helpers
+  ```
+
+  ## Day 5 Polish
+
+  - Added toast feedback for create, update, and delete actions
+  - Added empty and loading states to both data grids
+  - Added refresh actions and summary cards
+  - Improved README to reflect the actual application
