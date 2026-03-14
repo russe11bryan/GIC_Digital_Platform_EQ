@@ -34,11 +34,28 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
+// Initialize database with seed data
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.Migrate();
-    await SeedData.InitializeAsync(dbContext);
+    try
+    {
+        Console.WriteLine("Starting database initialization...");
+        
+        // Create database and schema from DbContext model
+        var dbCreated = dbContext.Database.EnsureCreated();
+        Console.WriteLine($"Database schema: {(dbCreated ? "created" : "already exists")}");
+        
+        // Seed initial data
+        Console.WriteLine("Starting database seeding...");
+        SeedData.InitializeAsync(dbContext).GetAwaiter().GetResult();
+        Console.WriteLine("Database initialization completed successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error during database initialization: {ex}");
+        throw;
+    }
 }
 
 if (app.Environment.IsDevelopment())
