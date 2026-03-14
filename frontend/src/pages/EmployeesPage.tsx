@@ -13,6 +13,8 @@ export function EmployeesPage() {
   const { message } = App.useApp()
   const [search, setSearch] = useState('')
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
+  const [viewedEmployee, setViewedEmployee] = useState<Employee | null>(null)
+  const [viewOpen, setViewOpen] = useState(false)
   const [createOpen, setCreateOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
 
@@ -111,8 +113,8 @@ export function EmployeesPage() {
             onClick={(e) => {
               e.stopPropagation()
               if (data) {
-                setSelectedEmployee(data)
-                setEditOpen(true)
+                setViewedEmployee(data)
+                setViewOpen(true)
               }
             }}
           >
@@ -265,7 +267,17 @@ export function EmployeesPage() {
                 rowSelection="single"
                 suppressCellFocus
                 loading={employeesQuery.isFetching}
-                onRowClicked={(event) => setSelectedEmployee(event.data ?? null)}
+                onRowClicked={(event) => {
+                  const clickedEmployee = event.data ?? null
+                  setSelectedEmployee((prev) => {
+                    const shouldUnselect = prev?.id === clickedEmployee?.id
+                    if (shouldUnselect) {
+                      event.node.setSelected(false)
+                      return null
+                    }
+                    return clickedEmployee
+                  })
+                }}
               />
             </div>
           </div>
@@ -301,6 +313,58 @@ export function EmployeesPage() {
         onCancel={() => setEditOpen(false)}
         onSubmit={handleUpdate}
       />
+
+      <Modal
+        open={viewOpen}
+        title={viewedEmployee ? viewedEmployee.name : 'Employee'}
+        onCancel={() => setViewOpen(false)}
+        footer={[
+          <Button key="close" type="primary" onClick={() => setViewOpen(false)}>
+            Close
+          </Button>,
+        ]}
+      >
+        <div className="cafe-view-card">
+          <div className="cafe-view-section">
+            <Typography.Text className="cafe-view-label">Employee Details</Typography.Text>
+            <div className="employee-view-grid">
+              <div className="employee-view-item">
+                <Typography.Text className="employee-view-key">ID</Typography.Text>
+                <Typography.Text className="employee-view-value">{viewedEmployee?.id ?? '-'}</Typography.Text>
+              </div>
+              <div className="employee-view-item">
+                <Typography.Text className="employee-view-key">Email</Typography.Text>
+                <Typography.Text className="employee-view-value">{viewedEmployee?.emailAddress ?? '-'}</Typography.Text>
+              </div>
+              <div className="employee-view-item">
+                <Typography.Text className="employee-view-key">Phone</Typography.Text>
+                <Typography.Text className="employee-view-value">{viewedEmployee?.phoneNumber ?? '-'}</Typography.Text>
+              </div>
+              <div className="employee-view-item">
+                <Typography.Text className="employee-view-key">Cafe</Typography.Text>
+                <Typography.Text className="employee-view-value">{viewedEmployee?.cafe ?? 'Unassigned'}</Typography.Text>
+              </div>
+            </div>
+          </div>
+
+          <div className="cafe-view-section">
+            <Typography.Text className="cafe-view-label">Work Summary</Typography.Text>
+            <div className="cafe-view-value">
+              <Tag
+                className={
+                  (viewedEmployee?.daysWorked ?? 0) >= 30
+                    ? 'soft-chip chip-positive'
+                    : (viewedEmployee?.daysWorked ?? 0) >= 14
+                      ? 'soft-chip chip-warning'
+                      : 'soft-chip'
+                }
+              >
+                {viewedEmployee?.daysWorked ?? 0} Days Worked
+              </Tag>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </Space>
   )
 }
