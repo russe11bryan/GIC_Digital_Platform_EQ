@@ -223,6 +223,42 @@
   min-width: 220px;
 }
 
+.dashboard-title-row {
+  margin-top: 2px;
+}
+
+.summary-card {
+  border: 1px solid #ebebeb;
+  border-radius: 14px;
+  background: #f5f6fa;
+  box-shadow: none;
+}
+
+.dashboard-list-card {
+  border: 1px solid #ebebeb;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.dashboard-mini-table .ant-table {
+  background: transparent;
+}
+
+.dashboard-mini-table .ant-table-thead > tr > th {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #94a3b8;
+  background: #ffffff;
+}
+
+.dashboard-mini-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid #f1f5f9;
+  color: #0f172a;
+}
+
 .metric-trend {
   margin-top: 8px;
   height: 26px;

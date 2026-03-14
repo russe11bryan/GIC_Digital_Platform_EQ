@@ -11,6 +11,7 @@ import { Avatar, Badge, Layout, Menu, Typography } from 'antd'
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { AccountPage } from './pages/AccountPage'
 import { CafesPage } from './pages/CafesPage'
+import { DashboardPage } from './pages/DashboardPage'
 import { EmployeesPage } from './pages/EmployeesPage'
 import { HelpSupportPage } from './pages/HelpSupportPage'
 import { NotificationsPage } from './pages/NotificationsPage'
@@ -39,7 +40,7 @@ function AppShell() {
           items={[
             { key: '/cafes', icon: <ShopOutlined />, label: 'Cafes' },
             { key: '/employees', icon: <TeamOutlined />, label: 'Employees' },
-            { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard (Soon)', disabled: true },
+            { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
             { key: '/settings', icon: <SettingOutlined />, label: 'Settings (Soon)', disabled: true },
           ]}
         />
@@ -74,6 +75,7 @@ function AppShell() {
         <Content className="app-content">
           <Routes>
             <Route path="/" element={<Navigate to="/cafes" replace />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/cafes" element={<CafesPage />} />
             <Route path="/employees" element={<EmployeesPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
