@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons'
-import { App, Alert, Button, Card, Empty, Input, Modal, Space, Spin, Statistic, Typography } from 'antd'
+import { App, Alert, Avatar, Button, Card, Empty, Input, Modal, Space, Spin, Statistic, Tag, Typography } from 'antd'
 import type { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import { useMemo, useState } from 'react'
@@ -33,12 +33,61 @@ export function EmployeesPage() {
 
   const columnDefs = useMemo<ColDef<Employee>[]>(
     () => [
-      { headerName: 'Employee ID', field: 'id', width: 140 },
-      { headerName: 'Name', field: 'name', width: 150 },
-      { headerName: 'Email', field: 'emailAddress', flex: 1 },
-      { headerName: 'Phone', field: 'phoneNumber', width: 130 },
-      { headerName: 'Days Worked', field: 'daysWorked', width: 130 },
-      { headerName: 'Cafe', field: 'cafe', width: 140 },
+      {
+        headerName: 'Name',
+        field: 'name',
+        minWidth: 240,
+        flex: 1,
+        sortable: true,
+        cellRenderer: ({ data }: { data?: Employee }) => {
+          if (!data) {
+            return null
+          }
+
+          return (
+            <div className="cell-cafe">
+              <Avatar size={32}>{data.name.slice(0, 1).toUpperCase()}</Avatar>
+              <div>
+                <div className="cell-title">{data.name}</div>
+                <div className="cell-subtitle">#{data.id}</div>
+              </div>
+            </div>
+          )
+        },
+      },
+      {
+        headerName: 'Email Address',
+        field: 'emailAddress',
+        minWidth: 260,
+        flex: 1.1,
+        sortable: true,
+      },
+      {
+        headerName: 'Phone Number',
+        field: 'phoneNumber',
+        minWidth: 180,
+        width: 190,
+        sortable: true,
+      },
+      {
+        headerName: 'Days Worked',
+        field: 'daysWorked',
+        width: 160,
+        sortable: true,
+        cellRenderer: ({ value }: { value?: number }) => {
+          const days = value ?? 0
+          const cls = days >= 30 ? 'soft-chip chip-positive' : days >= 14 ? 'soft-chip chip-warning' : 'soft-chip'
+          return <Tag className={cls}>{days} Days</Tag>
+        },
+      },
+      {
+        headerName: 'Cafe',
+        field: 'cafe',
+        width: 220,
+        sortable: true,
+        cellRenderer: ({ value }: { value?: string | null }) =>
+          value ? <Tag className="soft-chip chip-neutral">{value}</Tag> : <Tag className="soft-chip">Unassigned</Tag>,
+      },
     ],
     [],
   )
@@ -88,14 +137,22 @@ export function EmployeesPage() {
   const selectedEmployeeCafeId = selectedEmployee?.cafe ? cafeIdByName.get(selectedEmployee.cafe) : undefined
 
   return (
-    <Space direction="vertical" size={16} style={{ width: '100%' }}>
-      <Typography.Title level={3} style={{ margin: 0 }}>
+    <Space className="page-wrap" direction="vertical" size={16} style={{ width: '100%' }}>
+      <Typography.Title className="page-title" level={3} style={{ margin: 0 }}>
         Employees
       </Typography.Title>
 
-      <Space size={16} wrap>
+      <Space className="stats-row" size={16} wrap>
         <Card>
           <Statistic title="Total Employees" value={(employeesQuery.data ?? []).length} />
+          <div className="metric-trend" aria-hidden>
+            <span style={{ height: 11 }} />
+            <span style={{ height: 17 }} />
+            <span style={{ height: 13 }} />
+            <span style={{ height: 20 }} />
+            <span style={{ height: 15 }} />
+            <span style={{ height: 18 }} />
+          </div>
         </Card>
         <Card>
           <Statistic
@@ -109,11 +166,19 @@ export function EmployeesPage() {
                   )
             }
           />
+          <div className="metric-trend" aria-hidden>
+            <span style={{ height: 9 }} />
+            <span style={{ height: 14 }} />
+            <span style={{ height: 12 }} />
+            <span style={{ height: 19 }} />
+            <span style={{ height: 16 }} />
+            <span style={{ height: 21 }} />
+          </div>
         </Card>
       </Space>
 
-      <Card>
-        <Space wrap>
+      <Card className="toolbar-card">
+        <Space className="toolbar" wrap>
           <Input
             placeholder="Filter by cafe name"
             value={cafeFilter}
@@ -121,10 +186,12 @@ export function EmployeesPage() {
             style={{ width: 220 }}
           />
           <Button onClick={() => setAppliedCafeFilter(cafeFilter.trim())}>Apply Filter</Button>
-          <Button onClick={() => {
-            setCafeFilter('')
-            setAppliedCafeFilter('')
-          }}>
+          <Button
+            onClick={() => {
+              setCafeFilter('')
+              setAppliedCafeFilter('')
+            }}
+          >
             Clear
           </Button>
           <Button onClick={() => void employeesQuery.refetch()} loading={employeesQuery.isFetching && !employeesQuery.isLoading}>
@@ -151,7 +218,7 @@ export function EmployeesPage() {
         />
       )}
 
-      <Card>
+      <Card className="grid-card">
         {employeesQuery.isLoading ? (
           <div className="page-state">
             <Spin size="large" />
@@ -161,14 +228,21 @@ export function EmployeesPage() {
             <Empty description="No employees found" />
           </div>
         ) : (
-          <div className="ag-theme-alpine" style={{ height: 460, width: '100%' }}>
-            <AgGridReact<Employee>
-              rowData={employeesQuery.data ?? []}
-              columnDefs={columnDefs}
-              rowSelection="single"
-              loading={employeesQuery.isFetching}
-              onRowClicked={(event) => setSelectedEmployee(event.data ?? null)}
-            />
+          <div className="grid-shell">
+            <div className="ag-theme-alpine" style={{ height: 500, width: '100%' }}>
+              <AgGridReact<Employee>
+                rowData={employeesQuery.data ?? []}
+                columnDefs={columnDefs}
+                rowHeight={86}
+                defaultColDef={{
+                  resizable: true,
+                }}
+                rowSelection="single"
+                suppressCellFocus
+                loading={employeesQuery.isFetching}
+                onRowClicked={(event) => setSelectedEmployee(event.data ?? null)}
+              />
+            </div>
           </div>
         )}
       </Card>

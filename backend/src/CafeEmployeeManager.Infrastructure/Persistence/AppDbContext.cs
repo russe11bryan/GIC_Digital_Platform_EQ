@@ -21,7 +21,7 @@ public class AppDbContext : DbContext, IAppDbContext
         modelBuilder.Entity<Cafe>(entity =>
         {
             entity.HasKey(x => x.Id);
-            entity.Property(x => x.Name).IsRequired().HasMaxLength(10);
+            entity.Property(x => x.Name).IsRequired().HasMaxLength(50);
             entity.Property(x => x.Description).IsRequired().HasMaxLength(256);
             entity.Property(x => x.Location).IsRequired().HasMaxLength(100);
             entity.Property(x => x.Logo).HasMaxLength(500);
@@ -31,7 +31,7 @@ public class AppDbContext : DbContext, IAppDbContext
         {
             entity.HasKey(x => x.Id);
             entity.Property(x => x.Id).IsRequired().HasMaxLength(9);
-            entity.Property(x => x.Name).IsRequired().HasMaxLength(10);
+            entity.Property(x => x.Name).IsRequired().HasMaxLength(50);
             entity.Property(x => x.EmailAddress).IsRequired().HasMaxLength(100);
             entity.Property(x => x.PhoneNumber).IsRequired().HasMaxLength(8);
             entity.Property(x => x.Gender).IsRequired().HasMaxLength(10);

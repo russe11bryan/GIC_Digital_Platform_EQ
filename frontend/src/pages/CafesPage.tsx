@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons'
-import { App, Alert, Button, Card, Empty, Input, Modal, Space, Spin, Statistic, Typography } from 'antd'
+import { App, Alert, Avatar, Button, Card, Empty, Input, Modal, Space, Spin, Statistic, Tag, Typography } from 'antd'
 import type { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import { useMemo, useState } from 'react'
@@ -23,10 +23,55 @@ export function CafesPage() {
 
   const columnDefs = useMemo<ColDef<Cafe>[]>(
     () => [
-      { headerName: 'Name', field: 'name', flex: 1 },
-      { headerName: 'Description', field: 'description', flex: 1.4 },
-      { headerName: 'Employees', field: 'employees', width: 120 },
-      { headerName: 'Location', field: 'location', width: 140 },
+      {
+        headerName: 'Name',
+        field: 'name',
+        minWidth: 240,
+        flex: 1,
+        sortable: true,
+        cellRenderer: ({ data }: { data?: Cafe }) => {
+          if (!data) {
+            return null
+          }
+
+          return (
+            <div className="cell-cafe">
+              <Avatar src={data.logo ?? undefined} size={32}>
+                {data.name.slice(0, 1).toUpperCase()}
+              </Avatar>
+              <div>
+                <div className="cell-title">{data.name}</div>
+                <div className="cell-subtitle">#{data.id.slice(0, 8)}</div>
+              </div>
+            </div>
+          )
+        },
+      },
+      {
+        headerName: 'Description',
+        field: 'description',
+        minWidth: 320,
+        flex: 1.2,
+        sortable: true,
+        cellRenderer: ({ value }: { value?: string }) => <span className="truncate-cell">{value}</span>,
+      },
+      {
+        headerName: 'Employees',
+        field: 'employees',
+        width: 170,
+        sortable: true,
+        cellRenderer: ({ value }: { value?: number }) => {
+          const count = value ?? 0
+          return <Tag className={count > 0 ? 'soft-chip chip-positive' : 'soft-chip'}>{count} Employees</Tag>
+        },
+      },
+      {
+        headerName: 'Location',
+        field: 'location',
+        width: 180,
+        sortable: true,
+        cellRenderer: ({ value }: { value?: string }) => <Tag className="soft-chip chip-neutral">{value}</Tag>,
+      },
     ],
     [],
   )
@@ -79,22 +124,38 @@ export function CafesPage() {
   }
 
   return (
-    <Space direction="vertical" size={16} style={{ width: '100%' }}>
-      <Typography.Title level={3} style={{ margin: 0 }}>
+    <Space className="page-wrap" direction="vertical" size={16} style={{ width: '100%' }}>
+      <Typography.Title className="page-title" level={3} style={{ margin: 0 }}>
         Cafes
       </Typography.Title>
 
-      <Space size={16} wrap>
+      <Space className="stats-row" size={16} wrap>
         <Card>
           <Statistic title="Total Cafes" value={(cafesQuery.data ?? []).length} />
+          <div className="metric-trend" aria-hidden>
+            <span style={{ height: 10 }} />
+            <span style={{ height: 16 }} />
+            <span style={{ height: 12 }} />
+            <span style={{ height: 20 }} />
+            <span style={{ height: 14 }} />
+            <span style={{ height: 18 }} />
+          </div>
         </Card>
         <Card>
           <Statistic title="Assigned Employees" value={totalEmployees} />
+          <div className="metric-trend" aria-hidden>
+            <span style={{ height: 12 }} />
+            <span style={{ height: 18 }} />
+            <span style={{ height: 11 }} />
+            <span style={{ height: 22 }} />
+            <span style={{ height: 15 }} />
+            <span style={{ height: 19 }} />
+          </div>
         </Card>
       </Space>
 
-      <Card>
-        <Space wrap>
+      <Card className="toolbar-card">
+        <Space className="toolbar" wrap>
           <Input
             placeholder="Filter by location"
             value={locationFilter}
@@ -127,7 +188,7 @@ export function CafesPage() {
         <Alert type="error" message="Failed to load cafes" description={getErrorMessage(cafesQuery.error)} showIcon />
       )}
 
-      <Card>
+      <Card className="grid-card">
         {cafesQuery.isLoading ? (
           <div className="page-state">
             <Spin size="large" />
@@ -137,14 +198,21 @@ export function CafesPage() {
             <Empty description="No cafes found" />
           </div>
         ) : (
-          <div className="ag-theme-alpine" style={{ height: 460, width: '100%' }}>
-            <AgGridReact<Cafe>
-              rowData={cafesQuery.data ?? []}
-              columnDefs={columnDefs}
-              rowSelection="single"
-              loading={cafesQuery.isFetching}
-              onRowClicked={(event) => setSelectedCafe(event.data ?? null)}
-            />
+          <div className="grid-shell">
+            <div className="ag-theme-alpine" style={{ height: 460, width: '100%' }}>
+              <AgGridReact<Cafe>
+                rowData={cafesQuery.data ?? []}
+                columnDefs={columnDefs}
+                rowHeight={86}
+                defaultColDef={{
+                  resizable: true,
+                }}
+                rowSelection="single"
+                suppressCellFocus
+                loading={cafesQuery.isFetching}
+                onRowClicked={(event) => setSelectedCafe(event.data ?? null)}
+              />
+            </div>
           </div>
         )}
       </Card>

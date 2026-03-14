@@ -1,39 +1,92 @@
-import { Layout, Menu, Typography } from 'antd'
+import {
+  BellOutlined,
+  DashboardOutlined,
+  QuestionCircleOutlined,
+  SearchOutlined,
+  SettingOutlined,
+  ShopOutlined,
+  TeamOutlined,
+  UserOutlined,
+} from '@ant-design/icons'
+import { Avatar, Badge, Input, Layout, Menu, Typography } from 'antd'
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { AccountPage } from './pages/AccountPage'
 import { CafesPage } from './pages/CafesPage'
 import { EmployeesPage } from './pages/EmployeesPage'
+import { HelpSupportPage } from './pages/HelpSupportPage'
+import { NotificationsPage } from './pages/NotificationsPage'
+import './App.css'
 
-const { Header, Content } = Layout
+const { Sider, Header, Content } = Layout
 
 function AppShell() {
   const location = useLocation()
   const navigate = useNavigate()
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography.Title level={4} style={{ color: 'white', margin: 0 }}>
-          Cafe Employee Manager
-        </Typography.Title>
+    <Layout className="dashboard-layout">
+      <Sider width={230} className="dashboard-sider">
+        <div className="brand-block">
+          <span className="brand-dot" />
+          <Typography.Text className="brand-title">CafeManager</Typography.Text>
+        </div>
+
         <Menu
+          className="side-menu"
           theme="dark"
-          mode="horizontal"
+          mode="inline"
           selectedKeys={[location.pathname]}
-          items={[
-            { key: '/cafes', label: 'Cafes' },
-            { key: '/employees', label: 'Employees' },
-          ]}
           onClick={(event) => navigate(event.key)}
-          style={{ minWidth: 260 }}
+          items={[
+            { key: '/cafes', icon: <ShopOutlined />, label: 'Cafes' },
+            { key: '/employees', icon: <TeamOutlined />, label: 'Employees' },
+            { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard (Soon)', disabled: true },
+            { key: '/settings', icon: <SettingOutlined />, label: 'Settings (Soon)', disabled: true },
+          ]}
         />
-      </Header>
-      <Content style={{ padding: 24 }}>
-        <Routes>
-          <Route path="/" element={<Navigate to="/cafes" replace />} />
-          <Route path="/cafes" element={<CafesPage />} />
-          <Route path="/employees" element={<EmployeesPage />} />
-        </Routes>
-      </Content>
+
+        <div className="sider-footer">
+          <button type="button" className="sider-footer-item" onClick={() => navigate('/help-support')}>
+            <QuestionCircleOutlined />
+            <span>Help & Support</span>
+          </button>
+          <button type="button" className="sider-footer-item" onClick={() => navigate('/account')}>
+            <UserOutlined />
+            <span>Account</span>
+          </button>
+        </div>
+      </Sider>
+
+      <Layout className="dashboard-main">
+        <Header className="top-header">
+          <Input
+            className="top-search"
+            prefix={<SearchOutlined />}
+            placeholder="Search cafes, employees..."
+          />
+
+          <div className="top-actions">
+            <Badge dot>
+              <BellOutlined className="top-icon" onClick={() => navigate('/notifications')} />
+            </Badge>
+            <button type="button" className="profile-chip" onClick={() => navigate('/account')}>
+              <Avatar size={28} icon={<UserOutlined />} />
+              <span>Admin</span>
+            </button>
+          </div>
+        </Header>
+
+        <Content className="app-content">
+          <Routes>
+            <Route path="/" element={<Navigate to="/cafes" replace />} />
+            <Route path="/cafes" element={<CafesPage />} />
+            <Route path="/employees" element={<EmployeesPage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/account" element={<AccountPage />} />
+            <Route path="/help-support" element={<HelpSupportPage />} />
+          </Routes>
+        </Content>
+      </Layout>
     </Layout>
   )
 }

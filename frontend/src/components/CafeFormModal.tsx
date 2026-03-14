@@ -56,7 +56,7 @@ export function CafeFormModal({ open, loading, title, initialValues, onCancel, o
         <Form.Item
           label="Name"
           name="name"
-          rules={[{ required: true }, { min: 6, max: 10, message: 'Name must be 6-10 characters' }]}
+          rules={[{ required: true }, { min: 6, max: 50, message: 'Name must be 6-50 characters' }]}
         >
           <Input />
         </Form.Item>

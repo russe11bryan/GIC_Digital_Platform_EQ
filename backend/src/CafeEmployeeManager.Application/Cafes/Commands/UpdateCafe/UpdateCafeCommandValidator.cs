@@ -11,7 +11,7 @@ public class UpdateCafeCommandValidator : AbstractValidator<UpdateCafeCommand>
 
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Name is required")
-            .Length(6, 10).WithMessage("Name must be between 6 and 10 characters");
+            .Length(6, 50).WithMessage("Name must be between 6 and 50 characters");
 
         RuleFor(x => x.Description)
             .NotEmpty().WithMessage("Description is required")
