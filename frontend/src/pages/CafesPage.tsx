@@ -1,4 +1,4 @@
-import { PlusOutlined } from '@ant-design/icons'
+import { PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import { App, Alert, Avatar, Button, Card, Empty, Input, Modal, Space, Spin, Statistic, Tag, Typography } from 'antd'
 import type { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
@@ -10,16 +10,26 @@ import { getErrorMessage } from '../utils/getErrorMessage'
 
 export function CafesPage() {
   const { message } = App.useApp()
-  const [locationFilter, setLocationFilter] = useState('')
-  const [appliedLocationFilter, setAppliedLocationFilter] = useState('')
+  const [search, setSearch] = useState('')
   const [selectedCafe, setSelectedCafe] = useState<Cafe | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
 
-  const cafesQuery = useCafes(appliedLocationFilter)
+  const cafesQuery = useCafes('')
   const createCafeMutation = useCreateCafe()
   const updateCafeMutation = useUpdateCafe()
   const deleteCafeMutation = useDeleteCafe()
+
+  const filteredCafes = useMemo(() => {
+    const term = search.trim().toLowerCase()
+    if (!term) return cafesQuery.data ?? []
+    return (cafesQuery.data ?? []).filter(
+      (c) =>
+        c.name.toLowerCase().includes(term) ||
+        c.description.toLowerCase().includes(term) ||
+        c.location.toLowerCase().includes(term),
+    )
+  }, [cafesQuery.data, search])
 
   const columnDefs = useMemo<ColDef<Cafe>[]>(
     () => [
@@ -71,6 +81,27 @@ export function CafesPage() {
         width: 180,
         sortable: true,
         cellRenderer: ({ value }: { value?: string }) => <Tag className="soft-chip chip-neutral">{value}</Tag>,
+      },
+      {
+        headerName: 'Action',
+        field: 'id',
+        width: 120,
+        sortable: false,
+        cellRenderer: ({ data }: { data?: Cafe }) => (
+          <button
+            type="button"
+            className="row-action-btn"
+            onClick={(e) => {
+              e.stopPropagation()
+              if (data) {
+                setSelectedCafe(data)
+                setEditOpen(true)
+              }
+            }}
+          >
+            View
+          </button>
+        ),
       },
     ],
     [],
@@ -157,18 +188,13 @@ export function CafesPage() {
       <Card className="toolbar-card">
         <Space className="toolbar" wrap>
           <Input
-            placeholder="Filter by location"
-            value={locationFilter}
-            onChange={(event) => setLocationFilter(event.target.value)}
-            style={{ width: 220 }}
+            className="pill-search"
+            prefix={<SearchOutlined />}
+            placeholder="Search anything on Cafes"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            allowClear
           />
-          <Button onClick={() => setAppliedLocationFilter(locationFilter.trim())}>Apply Filter</Button>
-          <Button onClick={() => {
-            setLocationFilter('')
-            setAppliedLocationFilter('')
-          }}>
-            Clear
-          </Button>
           <Button onClick={() => void cafesQuery.refetch()} loading={cafesQuery.isFetching && !cafesQuery.isLoading}>
             Refresh
           </Button>
@@ -201,9 +227,9 @@ export function CafesPage() {
           <div className="grid-shell">
             <div className="ag-theme-alpine" style={{ height: 460, width: '100%' }}>
               <AgGridReact<Cafe>
-                rowData={cafesQuery.data ?? []}
+                rowData={filteredCafes}
                 columnDefs={columnDefs}
-                rowHeight={86}
+                rowHeight={72}
                 defaultColDef={{
                   resizable: true,
                 }}

@@ -1,4 +1,4 @@
-import { PlusOutlined } from '@ant-design/icons'
+import { PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import { App, Alert, Avatar, Button, Card, Empty, Input, Modal, Space, Spin, Statistic, Tag, Typography } from 'antd'
 import type { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
@@ -11,17 +11,28 @@ import { getErrorMessage } from '../utils/getErrorMessage'
 
 export function EmployeesPage() {
   const { message } = App.useApp()
-  const [cafeFilter, setCafeFilter] = useState('')
-  const [appliedCafeFilter, setAppliedCafeFilter] = useState('')
+  const [search, setSearch] = useState('')
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
 
-  const employeesQuery = useEmployees(appliedCafeFilter)
+  const employeesQuery = useEmployees('')
   const cafesQuery = useCafes('')
   const createEmployeeMutation = useCreateEmployee()
   const updateEmployeeMutation = useUpdateEmployee()
   const deleteEmployeeMutation = useDeleteEmployee()
+
+  const filteredEmployees = useMemo(() => {
+    const term = search.trim().toLowerCase()
+    if (!term) return employeesQuery.data ?? []
+    return (employeesQuery.data ?? []).filter(
+      (e) =>
+        e.name.toLowerCase().includes(term) ||
+        e.emailAddress.toLowerCase().includes(term) ||
+        e.phoneNumber.toLowerCase().includes(term) ||
+        (e.cafe ?? '').toLowerCase().includes(term),
+    )
+  }, [employeesQuery.data, search])
 
   const cafeIdByName = useMemo(() => {
     const mapping = new Map<string, string>()
@@ -87,6 +98,27 @@ export function EmployeesPage() {
         sortable: true,
         cellRenderer: ({ value }: { value?: string | null }) =>
           value ? <Tag className="soft-chip chip-neutral">{value}</Tag> : <Tag className="soft-chip">Unassigned</Tag>,
+      },
+      {
+        headerName: 'Action',
+        field: 'id',
+        width: 120,
+        sortable: false,
+        cellRenderer: ({ data }: { data?: Employee }) => (
+          <button
+            type="button"
+            className="row-action-btn"
+            onClick={(e) => {
+              e.stopPropagation()
+              if (data) {
+                setSelectedEmployee(data)
+                setEditOpen(true)
+              }
+            }}
+          >
+            View
+          </button>
+        ),
       },
     ],
     [],
@@ -180,20 +212,13 @@ export function EmployeesPage() {
       <Card className="toolbar-card">
         <Space className="toolbar" wrap>
           <Input
-            placeholder="Filter by cafe name"
-            value={cafeFilter}
-            onChange={(event) => setCafeFilter(event.target.value)}
-            style={{ width: 220 }}
+            className="pill-search"
+            prefix={<SearchOutlined />}
+            placeholder="Search anything on Employees"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            allowClear
           />
-          <Button onClick={() => setAppliedCafeFilter(cafeFilter.trim())}>Apply Filter</Button>
-          <Button
-            onClick={() => {
-              setCafeFilter('')
-              setAppliedCafeFilter('')
-            }}
-          >
-            Clear
-          </Button>
           <Button onClick={() => void employeesQuery.refetch()} loading={employeesQuery.isFetching && !employeesQuery.isLoading}>
             Refresh
           </Button>
@@ -229,11 +254,11 @@ export function EmployeesPage() {
           </div>
         ) : (
           <div className="grid-shell">
-            <div className="ag-theme-alpine" style={{ height: 500, width: '100%' }}>
+            <div className="ag-theme-alpine" style={{ height: 460, width: '100%' }}>
               <AgGridReact<Employee>
-                rowData={employeesQuery.data ?? []}
+                rowData={filteredEmployees}
                 columnDefs={columnDefs}
-                rowHeight={86}
+                rowHeight={72}
                 defaultColDef={{
                   resizable: true,
                 }}

@@ -2,13 +2,12 @@ import {
   BellOutlined,
   DashboardOutlined,
   QuestionCircleOutlined,
-  SearchOutlined,
   SettingOutlined,
   ShopOutlined,
   TeamOutlined,
   UserOutlined,
 } from '@ant-design/icons'
-import { Avatar, Badge, Input, Layout, Menu, Typography } from 'antd'
+import { Avatar, Badge, Layout, Menu, Typography } from 'antd'
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { AccountPage } from './pages/AccountPage'
 import { CafesPage } from './pages/CafesPage'
@@ -59,11 +58,7 @@ function AppShell() {
 
       <Layout className="dashboard-main">
         <Header className="top-header">
-          <Input
-            className="top-search"
-            prefix={<SearchOutlined />}
-            placeholder="Search cafes, employees..."
-          />
+          <div />
 
           <div className="top-actions">
             <Badge dot>
