@@ -227,7 +227,7 @@ export function EmployeesPage() {
           <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)} disabled={(cafesQuery.data ?? []).length === 0}>
             Add Employee
           </Button>
-          <Button disabled={!selectedEmployee || !selectedEmployeeCafeId} onClick={() => setEditOpen(true)}>
+          <Button disabled={!selectedEmployee} onClick={() => setEditOpen(true)}>
             Edit Selected
           </Button>
           <Button danger disabled={!selectedEmployee} onClick={handleDelete}>

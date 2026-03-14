@@ -88,8 +88,15 @@ export function EmployeeFormModal({ cafes, open, loading, title, initialValues, 
           <Select options={[{ value: 'Male' }, { value: 'Female' }]} />
         </Form.Item>
 
-        <Form.Item label="Cafe" name="cafeId" rules={[{ required: true }]}>
+        <Form.Item 
+          label="Cafe" 
+          name="cafeId" 
+          rules={initialValues ? [] : [{ required: true }]}
+          tooltip={initialValues ? "Leave empty to unassign from cafe" : ""}
+        >
           <Select
+            allowClear
+            placeholder="Select a cafe or leave empty to unassign"
             options={cafes.map((cafe) => ({ value: cafe.id, label: cafe.name }))}
             showSearch
             optionFilterProp="label"
