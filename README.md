@@ -293,15 +293,31 @@ http://localhost:5173
 
 # Docker Deployment
 
-To run the entire system:
+To run the entire system (PostgreSQL + API + Frontend):
 
-docker compose up --build
+cd gic-cafe-employee-manager
+docker compose up -d --build
 
 This will start:
 
 - Backend API
 - PostgreSQL
 - Frontend
+
+Containerized endpoints:
+
+- Frontend: `http://localhost:5180`
+- Backend API: `http://localhost:5068`
+- PostgreSQL: `localhost:5432`
+
+Quick smoke checks:
+
+- `curl http://localhost:5068/api/cafes`
+- `curl http://localhost:5180/health`
+
+To stop all services:
+
+- `docker compose down`
 
 ---
 
@@ -378,13 +394,25 @@ The database is seeded with sample cafés and employees during application start
 
 ---
 
+# CI Pipeline (Day 7)
+
+GitHub Actions CI is configured at `.github/workflows/ci.yml` and runs on push to `main` and pull requests.
+
+Checks included:
+
+- Backend restore and release build (`.NET 10`)
+- Frontend dependency install (`npm ci`)
+- Frontend lint (`npm run lint`)
+- Frontend production build (`npm run build`)
+
+---
+
 # Future Improvements
 
 - Authentication and authorization
 - Image upload for café logos
 - Pagination for large datasets
 - Unit and integration tests
-- CI/CD pipeline
 
 ---
 

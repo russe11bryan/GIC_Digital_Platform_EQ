@@ -1,0 +1,12 @@
+/Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Domain/bin/Release/net10.0/CafeEmployeeManager.Domain.deps.json
+/Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Domain/bin/Release/net10.0/CafeEmployeeManager.Domain.dll
+/Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Domain/bin/Release/net10.0/CafeEmployeeManager.Domain.pdb
+/Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Domain/obj/Release/net10.0/CafeEmployeeManager.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Domain/obj/Release/net10.0/CafeEmployeeManager.Domain.AssemblyInfoInputs.cache
+/Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Domain/obj/Release/net10.0/CafeEmployeeManager.Domain.AssemblyInfo.cs
+/Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Domain/obj/Release/net10.0/CafeEmployeeManager.Domain.csproj.CoreCompileInputs.cache
+/Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Domain/obj/Release/net10.0/CafeEmployeeManager.Domain.sourcelink.json
+/Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Domain/obj/Release/net10.0/CafeEmployeeManager.Domain.dll
+/Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Domain/obj/Release/net10.0/refint/CafeEmployeeManager.Domain.dll
+/Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Domain/obj/Release/net10.0/CafeEmployeeManager.Domain.pdb
+/Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Domain/obj/Release/net10.0/ref/CafeEmployeeManager.Domain.dll
