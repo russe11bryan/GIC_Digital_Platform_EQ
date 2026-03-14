@@ -110,7 +110,7 @@
 .top-actions {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
 }
 
 .top-icon {
@@ -120,17 +120,26 @@
 }
 
 .profile-chip {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
+  justify-content: center;
+  width: fit-content;
+  min-width: 0;
+  gap: 5px;
+  padding: 3px 8px 3px 6px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
   color: #1f2937;
   cursor: pointer;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-chip > span {
+  line-height: 1;
 }
 
 .profile-chip:hover {

@@ -65,7 +65,7 @@ function AppShell() {
               <BellOutlined className="top-icon" onClick={() => navigate('/notifications')} />
             </Badge>
             <button type="button" className="profile-chip" onClick={() => navigate('/account')}>
-              <Avatar size={28} icon={<UserOutlined />} />
+              <Avatar size={22} icon={<UserOutlined />} />
               <span>Admin</span>
             </button>
           </div>
