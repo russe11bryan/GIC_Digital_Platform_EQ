@@ -25,14 +25,17 @@ ARG VITE_API_BASE_URL=/api
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 RUN npm run build
 
-# Final stage - serve frontend with nginx and backend with reverse proxy
+# Final stage - serve frontend with nginx
 FROM nginx:1.27-alpine
 WORKDIR /app
 
 # Copy frontend build
 COPY --from=frontend-build /app/dist /usr/share/nginx/html
 
-# Copy nginx config
+# Create a script to substitute backend URL at runtime
+RUN mkdir -p /etc/nginx/templates
+
+# Copy nginx config template
 COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
