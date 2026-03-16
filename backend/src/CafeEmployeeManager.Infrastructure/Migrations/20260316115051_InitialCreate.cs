@@ -16,9 +16,9 @@ namespace CafeEmployeeManager.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    Logo = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    Logo = table.Column<string>(type: "character varying(5242880)", maxLength: 5242880, nullable: true),
                     Location = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
@@ -31,7 +31,7 @@ namespace CafeEmployeeManager.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "character varying(9)", maxLength: 9, nullable: false),
-                    Name = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     EmailAddress = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     PhoneNumber = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
                     Gender = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false)
