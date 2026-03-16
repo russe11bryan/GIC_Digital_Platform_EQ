@@ -21,7 +21,9 @@ builder.Services.AddCors(options =>
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:4173",
-        "http://127.0.0.1:4173"
+        "http://127.0.0.1:4173",
+        "http://localhost:3000",
+        "http://localhost:80"
     };
 
     // Add Vercel frontend URL if it exists in environment
@@ -29,6 +31,13 @@ builder.Services.AddCors(options =>
     if (!string.IsNullOrEmpty(vercelUrl))
     {
         allowedOrigins.Add($"https://{vercelUrl}");
+    }
+
+    // Add Railway frontend URL if it exists
+    var railwayUrl = Environment.GetEnvironmentVariable("RAILWAY_FRONTEND_URL");
+    if (!string.IsNullOrEmpty(railwayUrl))
+    {
+        allowedOrigins.Add(railwayUrl);
     }
 
     options.AddPolicy(FrontendCorsPolicy, policy =>
