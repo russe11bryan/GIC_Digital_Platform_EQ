@@ -5,7 +5,16 @@ using CafeEmployeeManager.Infrastructure;
 using CafeEmployeeManager.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-await BuildAndRunApp();
+try
+{
+    await BuildAndRunApp();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"FATAL ERROR: {ex.Message}");
+    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+    throw;
+}
 
 async Task BuildAndRunApp()
 {
@@ -92,62 +101,65 @@ async Task BuildAndRunApp()
 
     var app = builder.Build();
 
-    // Initialize database with migrations and seed data
-    try
+    // Initialize database with migrations and seed data in the background
+    // Don't block startup if database initialization fails
+    _ = Task.Run(async () =>
     {
-        if (!string.IsNullOrEmpty(databaseUrl))
+        try
         {
-            using (var scope = app.Services.CreateScope())
+            if (!string.IsNullOrEmpty(databaseUrl))
             {
-                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                Console.WriteLine("Starting database initialization...");
-                Console.WriteLine($"Database connection string configured: {(databaseUrl != null ? "Yes" : "No")}");
-                
-                try
+                using (var scope = app.Services.CreateScope())
                 {
-                    // Test connection
-                    var canConnect = await dbContext.Database.CanConnectAsync();
-                    Console.WriteLine($"Database connection test: {(canConnect ? "SUCCESS" : "FAILED")}");
+                    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                    Console.WriteLine("Starting database initialization...");
+                    Console.WriteLine($"Database connection string configured: {(databaseUrl != null ? "Yes" : "No")}");
                     
-                    if (canConnect)
+                    try
                     {
-                        // Apply migrations
-                        Console.WriteLine("Applying database migrations...");
-                        var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
-                        Console.WriteLine($"Pending migrations: {string.Join(", ", pendingMigrations) ?? "None"}");
+                        // Test connection
+                        var canConnect = await dbContext.Database.CanConnectAsync();
+                        Console.WriteLine($"Database connection test: {(canConnect ? "SUCCESS" : "FAILED")}");
                         
-                        await dbContext.Database.MigrateAsync();
-                        Console.WriteLine("Database migrations applied successfully.");
-                        
-                        // Seed initial data
-                        Console.WriteLine("Starting database seeding...");
-                        await SeedData.InitializeAsync(dbContext);
-                        Console.WriteLine("Database initialization completed successfully.");
+                        if (canConnect)
+                        {
+                            // Apply migrations
+                            Console.WriteLine("Applying database migrations...");
+                            var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
+                            Console.WriteLine($"Pending migrations: {string.Join(", ", pendingMigrations) ?? "None"}");
+                            
+                            await dbContext.Database.MigrateAsync();
+                            Console.WriteLine("Database migrations applied successfully.");
+                            
+                            // Seed initial data
+                            Console.WriteLine("Starting database seeding...");
+                            await SeedData.InitializeAsync(dbContext);
+                            Console.WriteLine("Database initialization completed successfully.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("WARNING: Could not connect to database - it may not be ready yet");
+                        }
                     }
-                    else
+                    catch (Exception migrationEx)
                     {
-                        Console.WriteLine("ERROR: Could not connect to database");
+                        Console.WriteLine($"Migration error: {migrationEx.Message}");
+                        Console.WriteLine($"Stack trace: {migrationEx.StackTrace}");
+                        // Don't throw - allow app to start anyway
                     }
-                }
-                catch (Exception migrationEx)
-                {
-                    Console.WriteLine($"Migration error: {migrationEx.Message}");
-                    Console.WriteLine($"Stack trace: {migrationEx.StackTrace}");
-                    throw;
                 }
             }
+            else
+            {
+                Console.WriteLine("DATABASE_URL not set - skipping database initialization");
+            }
         }
-        else
+        catch (Exception ex)
         {
-            Console.WriteLine("DATABASE_URL not set - skipping database initialization");
+            Console.WriteLine($"Error during database initialization: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
         }
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error during database initialization: {ex.Message}");
-        Console.WriteLine($"Stack trace: {ex.StackTrace}");
-        // Don't throw - allow app to start even if seeding fails
-    }
+    });
 
     if (app.Environment.IsDevelopment())
     {
