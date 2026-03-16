@@ -22,4 +22,8 @@ ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
 
 COPY --from=build /app/publish .
+
+# Trigger Railway redeploy
+ENV DEPLOY_TIMESTAMP="2026-03-17T17:00:00Z"
+
 ENTRYPOINT ["dotnet", "CafeEmployeeManager.Api.dll"]
