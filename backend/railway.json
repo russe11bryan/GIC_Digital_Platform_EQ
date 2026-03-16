@@ -5,8 +5,7 @@
     "dockerfile": "Dockerfile"
   },
   "deploy": {
-    "startCommand": "nginx -g 'daemon off;'",
     "numReplicas": 1,
-    "port": 80
+    "port": 8080
   }
 }
