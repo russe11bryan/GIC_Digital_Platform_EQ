@@ -1,26 +1,18 @@
-import {
-  BellOutlined,
-  DashboardOutlined,
-  QuestionCircleOutlined,
-  ShopOutlined,
-  TeamOutlined,
-  UserOutlined,
-} from '@ant-design/icons'
-import { Avatar, Badge, Layout, Menu, Typography } from 'antd'
+import { ShopOutlined, TeamOutlined } from '@ant-design/icons'
+import { Layout, Menu, Typography } from 'antd'
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { AccountPage } from './pages/AccountPage'
+import { CafeFormPage } from './pages/CafeFormPage'
 import { CafesPage } from './pages/CafesPage'
-import { DashboardPage } from './pages/DashboardPage'
+import { EmployeeFormPage } from './pages/EmployeeFormPage'
 import { EmployeesPage } from './pages/EmployeesPage'
-import { HelpSupportPage } from './pages/HelpSupportPage'
-import { NotificationsPage } from './pages/NotificationsPage'
 import './App.css'
 
-const { Sider, Header, Content } = Layout
+const { Sider, Content } = Layout
 
 function AppShell() {
   const location = useLocation()
   const navigate = useNavigate()
+  const selectedKey = location.pathname.startsWith('/employees') ? '/employees' : '/cafes'
 
   return (
     <Layout className="dashboard-layout">
@@ -34,51 +26,26 @@ function AppShell() {
           className="side-menu"
           theme="dark"
           mode="inline"
-          selectedKeys={[location.pathname]}
+          selectedKeys={[selectedKey]}
           onClick={(event) => navigate(event.key)}
           items={[
             { key: '/cafes', icon: <ShopOutlined />, label: 'Cafes' },
             { key: '/employees', icon: <TeamOutlined />, label: 'Employees' },
-            { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
           ]}
         />
-
-        <div className="sider-footer">
-          <button type="button" className="sider-footer-item" onClick={() => navigate('/help-support')}>
-            <QuestionCircleOutlined />
-            <span>Help & Support</span>
-          </button>
-          <button type="button" className="sider-footer-item" onClick={() => navigate('/account')}>
-            <UserOutlined />
-            <span>Account</span>
-          </button>
-        </div>
       </Sider>
 
       <Layout className="dashboard-main">
-        <Header className="top-header">
-          <div />
-
-          <div className="top-actions">
-            <Badge dot>
-              <BellOutlined className="top-icon" onClick={() => navigate('/notifications')} />
-            </Badge>
-            <button type="button" className="profile-chip" onClick={() => navigate('/account')}>
-              <Avatar size={22} icon={<UserOutlined />} />
-              <span>Admin</span>
-            </button>
-          </div>
-        </Header>
-
         <Content className="app-content">
           <Routes>
             <Route path="/" element={<Navigate to="/cafes" replace />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/cafes" element={<CafesPage />} />
+            <Route path="/cafes/new" element={<CafeFormPage />} />
+            <Route path="/cafes/:id/edit" element={<CafeFormPage />} />
             <Route path="/employees" element={<EmployeesPage />} />
-            <Route path="/notifications" element={<NotificationsPage />} />
-            <Route path="/account" element={<AccountPage />} />
-            <Route path="/help-support" element={<HelpSupportPage />} />
+            <Route path="/employees/new" element={<EmployeeFormPage />} />
+            <Route path="/employees/:id/edit" element={<EmployeeFormPage />} />
+            <Route path="*" element={<Navigate to="/cafes" replace />} />
           </Routes>
         </Content>
       </Layout>

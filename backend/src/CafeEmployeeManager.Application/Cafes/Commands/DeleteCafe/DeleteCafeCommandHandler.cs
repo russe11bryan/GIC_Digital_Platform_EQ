@@ -17,6 +17,7 @@ public class DeleteCafeCommandHandler : IRequestHandler<DeleteCafeCommand, Unit>
     {
         var cafe = await _context.Cafes
             .Include(c => c.EmployeeCafes)
+            .ThenInclude(ec => ec.Employee)
             .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
 
         if (cafe == null)
@@ -24,7 +25,11 @@ public class DeleteCafeCommandHandler : IRequestHandler<DeleteCafeCommand, Unit>
             throw new KeyNotFoundException($"Cafe with ID {request.Id} not found");
         }
 
-        // Cascade delete will handle EmployeeCafes automatically
+        var employeesToDelete = cafe.EmployeeCafes
+            .Select(employeeCafe => employeeCafe.Employee)
+            .ToList();
+
+        _context.Employees.RemoveRange(employeesToDelete);
         _context.Cafes.Remove(cafe);
         await _context.SaveChangesAsync(cancellationToken);
 

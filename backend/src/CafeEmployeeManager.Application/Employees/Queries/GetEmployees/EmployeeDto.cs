@@ -6,7 +6,8 @@ public class EmployeeDto
     public string Name { get; set; } = default!;
     public string EmailAddress { get; set; } = default!;
     public string PhoneNumber { get; set; } = default!;
+    public string Gender { get; set; } = default!;
     public int DaysWorked { get; set; }
     public string? Cafe { get; set; }
-    public string? Avatar { get; set; }
+    public Guid? CafeId { get; set; }
 }

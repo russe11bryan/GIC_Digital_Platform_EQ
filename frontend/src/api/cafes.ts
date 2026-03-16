@@ -14,7 +14,7 @@ export async function createCafe(payload: CreateCafePayload): Promise<string> {
 }
 
 export async function updateCafe(payload: UpdateCafePayload): Promise<void> {
-  await apiClient.put(`/cafes/${payload.id}`, payload)
+  await apiClient.put('/cafes', payload)
 }
 
 export async function deleteCafe(id: string): Promise<void> {

@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace CafeEmployeeManager.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("cafes")]
+[Route("api/cafes")]
 public class CafesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -33,6 +34,13 @@ public class CafesController : ControllerBase
         return CreatedAtAction(nameof(GetCafes), new { id }, id);
     }
 
+    [HttpPut]
+    public async Task<ActionResult> UpdateCafe([FromBody] UpdateCafeCommand command)
+    {
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateCafe(Guid id, [FromBody] UpdateCafeCommand command)
     {
@@ -42,6 +50,13 @@ public class CafesController : ControllerBase
         }
 
         await _mediator.Send(command);
+        return NoContent();
+    }
+
+    [HttpDelete]
+    public async Task<ActionResult> DeleteCafe([FromQuery] Guid id)
+    {
+        await _mediator.Send(new DeleteCafeCommand(id));
         return NoContent();
     }
 

@@ -25,45 +25,48 @@ public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeComman
             throw new KeyNotFoundException($"Employee with ID {request.Id} not found");
         }
 
-        // Verify cafe exists
-        var cafeExists = await _context.Cafes
-            .AnyAsync(c => c.Id == request.CafeId, cancellationToken);
-
-        if (!cafeExists)
-        {
-            throw new KeyNotFoundException($"Cafe with ID {request.CafeId} not found");
-        }
-
         // Update employee details
         employee.Name = request.Name;
         employee.EmailAddress = request.EmailAddress;
         employee.PhoneNumber = request.PhoneNumber;
         employee.Gender = request.Gender;
-        if (request.Avatar != null)
-        {
-            employee.Avatar = request.Avatar;
-        }
 
         // Update cafe assignment
-        if (employee.EmployeeCafe != null)
+        if (!request.CafeId.HasValue)
         {
-            if (employee.EmployeeCafe.CafeId != request.CafeId)
+            if (employee.EmployeeCafe != null)
             {
-                // Change cafe - update existing assignment
-                employee.EmployeeCafe.CafeId = request.CafeId;
-                employee.EmployeeCafe.StartDate = DateTime.UtcNow;
+                _context.EmployeeCafes.Remove(employee.EmployeeCafe);
             }
         }
         else
         {
-            // Create new assignment if none exists
-            var employeeCafe = new EmployeeCafe
+            var cafeExists = await _context.Cafes
+                .AnyAsync(c => c.Id == request.CafeId.Value, cancellationToken);
+
+            if (!cafeExists)
             {
-                EmployeeId = request.Id,
-                CafeId = request.CafeId,
-                StartDate = DateTime.UtcNow
-            };
-            _context.EmployeeCafes.Add(employeeCafe);
+                throw new KeyNotFoundException($"Cafe with ID {request.CafeId} not found");
+            }
+
+            if (employee.EmployeeCafe != null)
+            {
+                if (employee.EmployeeCafe.CafeId != request.CafeId.Value)
+                {
+                    employee.EmployeeCafe.CafeId = request.CafeId.Value;
+                    employee.EmployeeCafe.StartDate = DateTime.UtcNow;
+                }
+            }
+            else
+            {
+                var employeeCafe = new EmployeeCafe
+                {
+                    EmployeeId = request.Id,
+                    CafeId = request.CafeId.Value,
+                    StartDate = DateTime.UtcNow
+                };
+                _context.EmployeeCafes.Add(employeeCafe);
+            }
         }
 
         await _context.SaveChangesAsync(cancellationToken);

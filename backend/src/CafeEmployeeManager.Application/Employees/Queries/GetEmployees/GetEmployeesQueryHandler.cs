@@ -34,11 +34,12 @@ public class GetEmployeesQueryHandler : IRequestHandler<GetEmployeesQuery, List<
                 Name = e.Name,
                 EmailAddress = e.EmailAddress,
                 PhoneNumber = e.PhoneNumber,
+                Gender = e.Gender,
                 DaysWorked = e.EmployeeCafe != null 
                     ? (int)(DateTime.UtcNow - e.EmployeeCafe.StartDate).TotalDays 
                     : 0,
                 Cafe = e.EmployeeCafe != null ? e.EmployeeCafe.Cafe.Name : null,
-                Avatar = e.Avatar
+                CafeId = e.EmployeeCafe != null ? e.EmployeeCafe.CafeId : null
             })
             .OrderByDescending(e => e.DaysWorked)
             .ToListAsync(cancellationToken);

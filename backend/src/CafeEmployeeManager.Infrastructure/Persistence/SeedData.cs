@@ -13,7 +13,7 @@ public static class SeedData
         var cafe1 = new Cafe
         {
             Id = Guid.NewGuid(),
-            Name = "The Daily Grind",
+            Name = "DailyBrew",
             Description = "Cozy neighborhood cafe with artisan coffee",
             Location = "Orchard",
             Logo = null
@@ -31,7 +31,7 @@ public static class SeedData
         var cafe3 = new Cafe
         {
             Id = Guid.NewGuid(),
-            Name = "Espresso Express",
+            Name = "Espresso",
             Description = "Quick service cafe for on-the-go",
             Location = "Jurong",
             Logo = null
@@ -40,7 +40,7 @@ public static class SeedData
         var cafe4 = new Cafe
         {
             Id = Guid.NewGuid(),
-            Name = "Bean Scene",
+            Name = "BeanScene",
             Description = "Premium cafe with roasted beans",
             Location = "Marina Bay",
             Logo = null
@@ -50,7 +50,7 @@ public static class SeedData
         var employee1 = new Employee
         {
             Id = "UIA123456",
-            Name = "Daniel Lee",
+            Name = "Daniel",
             EmailAddress = "daniel.lee@example.com",
             PhoneNumber = "91234567",
             Gender = "Male"
@@ -59,7 +59,7 @@ public static class SeedData
         var employee2 = new Employee
         {
             Id = "UIB234567",
-            Name = "Rachel Wong",
+            Name = "Rachel",
             EmailAddress = "rachel.wong@example.com",
             PhoneNumber = "81234567",
             Gender = "Female"
@@ -68,7 +68,7 @@ public static class SeedData
         var employee3 = new Employee
         {
             Id = "UIC345678",
-            Name = "Michael Tan",
+            Name = "Michael",
             EmailAddress = "michael.tan@example.com",
             PhoneNumber = "92345678",
             Gender = "Male"
@@ -77,7 +77,7 @@ public static class SeedData
         var employee4 = new Employee
         {
             Id = "UID456789",
-            Name = "Sophie Chen",
+            Name = "Sophie",
             EmailAddress = "sophie.chen@example.com",
             PhoneNumber = "83456789",
             Gender = "Female"
@@ -86,7 +86,7 @@ public static class SeedData
         var employee5 = new Employee
         {
             Id = "UIE567890",
-            Name = "James Kumar",
+            Name = "James",
             EmailAddress = "james.kumar@example.com",
             PhoneNumber = "94567890",
             Gender = "Male"
@@ -95,7 +95,7 @@ public static class SeedData
         var employee6 = new Employee
         {
             Id = "UIF678901",
-            Name = "Lisa Ng",
+            Name = "LisaNg",
             EmailAddress = "lisa.ng@example.com",
             PhoneNumber = "85678901",
             Gender = "Female"
@@ -104,7 +104,7 @@ public static class SeedData
         var employee7 = new Employee
         {
             Id = "UIG789012",
-            Name = "Unassigned Staff",
+            Name = "NoCafeEmp",
             EmailAddress = "unassigned@example.com",
             PhoneNumber = "80001111",
             Gender = "Male"

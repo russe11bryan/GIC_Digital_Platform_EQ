@@ -1,71 +1,86 @@
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons'
-import { App, Alert, Avatar, Button, Card, Empty, Input, Modal, Space, Spin, Statistic, Tag, Typography } from 'antd'
+import { App, Alert, Avatar, Button, Card, Empty, Input, Modal, Space, Spin, Tag, Typography } from 'antd'
 import type { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { CafeFormModal } from '../components/CafeFormModal'
 import { useCafes, useCreateCafe, useDeleteCafe, useUpdateCafe } from '../hooks/useCafes'
-import { useEmployees } from '../hooks/useEmployees'
 import type { Cafe, CreateCafePayload, UpdateCafePayload } from '../types/models'
 import { getErrorMessage } from '../utils/getErrorMessage'
 
 export function CafesPage() {
   const { message } = App.useApp()
+  const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [selectedCafe, setSelectedCafe] = useState<Cafe | null>(null)
-  const [viewedCafe, setViewedCafe] = useState<Cafe | null>(null)
-  const [viewOpen, setViewOpen] = useState(false)
+  const [editingCafe, setEditingCafe] = useState<Cafe | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
-
   const cafesQuery = useCafes('')
-  const employeesQuery = useEmployees('')
   const createCafeMutation = useCreateCafe()
   const updateCafeMutation = useUpdateCafe()
   const deleteCafeMutation = useDeleteCafe()
 
+  const confirmDeleteCafe = useCallback((cafe: Cafe) => {
+    Modal.confirm({
+      title: 'Delete cafe',
+      content: `Delete ${cafe.name} and all employees assigned to it?`,
+      okText: 'Delete',
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await deleteCafeMutation.mutateAsync(cafe.id)
+          message.success('Cafe deleted successfully')
+          setSelectedCafe((current) => (current?.id === cafe.id ? null : current))
+          setEditingCafe((current) => (current?.id === cafe.id ? null : current))
+        } catch (error) {
+          message.error(getErrorMessage(error))
+        }
+      },
+    })
+  }, [deleteCafeMutation, message])
+
   const filteredCafes = useMemo(() => {
     const term = search.trim().toLowerCase()
-    if (!term) return cafesQuery.data ?? []
+    if (!term) {
+      return cafesQuery.data ?? []
+    }
+
     return (cafesQuery.data ?? []).filter(
-      (c) =>
-        c.name.toLowerCase().includes(term) ||
-        c.description.toLowerCase().includes(term) ||
-        c.location.toLowerCase().includes(term),
+      (cafe) =>
+        cafe.name.toLowerCase().includes(term) ||
+        cafe.description.toLowerCase().includes(term) ||
+        cafe.location.toLowerCase().includes(term),
     )
   }, [cafesQuery.data, search])
 
   const columnDefs = useMemo<ColDef<Cafe>[]>(
     () => [
       {
+        headerName: 'Logo',
+        field: 'logo',
+        width: 110,
+        sortable: false,
+        cellRenderer: ({ data }: { data?: Cafe }) =>
+          data ? (
+            <Avatar src={data.logo ?? undefined} size={36}>
+              {data.name.slice(0, 1).toUpperCase()}
+            </Avatar>
+          ) : null,
+      },
+      {
         headerName: 'Name',
         field: 'name',
-        minWidth: 240,
-        flex: 1,
+        minWidth: 160,
+        flex: 0.9,
         sortable: true,
-        cellRenderer: ({ data }: { data?: Cafe }) => {
-          if (!data) {
-            return null
-          }
-
-          return (
-            <div className="cell-cafe">
-              <Avatar src={data.logo ?? undefined} size={32}>
-                {data.name.slice(0, 1).toUpperCase()}
-              </Avatar>
-              <div>
-                <div className="cell-title">{data.name}</div>
-                <div className="cell-subtitle">#{data.id.slice(0, 8)}</div>
-              </div>
-            </div>
-          )
-        },
       },
       {
         headerName: 'Description',
         field: 'description',
-        minWidth: 320,
-        flex: 1.2,
+        minWidth: 260,
+        flex: 1.3,
         sortable: true,
         cellRenderer: ({ value }: { value?: string }) => (
           <span className="truncate-cell" title={value ?? ''}>
@@ -76,12 +91,14 @@ export function CafesPage() {
       {
         headerName: 'Employees',
         field: 'employees',
-        width: 170,
+        width: 150,
         sortable: true,
-        cellRenderer: ({ value }: { value?: number }) => {
-          const count = value ?? 0
-          return <Tag className={count > 0 ? 'soft-chip chip-positive' : 'soft-chip'}>{count} Employees</Tag>
-        },
+        cellRenderer: ({ data, value }: { data?: Cafe; value?: number }) =>
+          data ? (
+            <Button type="link" className="grid-link-button" onClick={() => navigate(`/employees?cafe=${encodeURIComponent(data.name)}`)}>
+              {value ?? 0}
+            </Button>
+          ) : null,
       },
       {
         headerName: 'Location',
@@ -91,118 +108,43 @@ export function CafesPage() {
         cellRenderer: ({ value }: { value?: string }) => <Tag className="soft-chip chip-neutral">{value}</Tag>,
       },
       {
-        headerName: 'Action',
+        headerName: 'Actions',
         field: 'id',
-        width: 120,
+        width: 180,
         sortable: false,
+        cellRendererParams: {
+          suppressMouseEventHandling: () => true,
+        },
         cellRenderer: ({ data }: { data?: Cafe }) => (
-          <button
-            type="button"
-            className="row-action-btn"
-            onClick={(e) => {
-              e.stopPropagation()
-              if (data) {
-                setViewedCafe(data)
-                setViewOpen(true)
-              }
-            }}
-          >
-            View
-          </button>
+          data ? (
+            <Space size={8}>
+              <Button size="small" onClick={(event) => {
+                event.stopPropagation()
+                setSelectedCafe(data)
+                setEditingCafe(data)
+                setEditOpen(true)
+              }}>
+                Edit
+              </Button>
+              <Button size="small" danger onClick={(event) => {
+                event.stopPropagation()
+                confirmDeleteCafe(data)
+              }}>
+                Delete
+              </Button>
+            </Space>
+          ) : null
         ),
       },
     ],
-    [],
+    [confirmDeleteCafe, navigate],
   )
-
-  const totalEmployees = useMemo(
-    () => (cafesQuery.data ?? []).reduce((sum, cafe) => sum + cafe.employees, 0),
-    [cafesQuery.data],
-  )
-
-  const viewedCafeEmployees = useMemo(() => {
-    const viewedCafeName = viewedCafe?.name?.trim().toLowerCase()
-    if (!viewedCafeName) {
-      return []
-    }
-
-    return (employeesQuery.data ?? []).filter(
-      (employee) => (employee.cafe ?? '').trim().toLowerCase() === viewedCafeName,
-    )
-  }, [employeesQuery.data, viewedCafe])
-
-  const handleCreate = async (payload: CreateCafePayload | UpdateCafePayload) => {
-    try {
-      await createCafeMutation.mutateAsync(payload as CreateCafePayload)
-      message.success('Cafe created successfully')
-      setCreateOpen(false)
-    } catch (error) {
-      message.error(getErrorMessage(error))
-    }
-  }
-
-  const handleUpdate = async (payload: CreateCafePayload | UpdateCafePayload) => {
-    try {
-      await updateCafeMutation.mutateAsync(payload as UpdateCafePayload)
-      message.success('Cafe updated successfully')
-      setEditOpen(false)
-    } catch (error) {
-      message.error(getErrorMessage(error))
-    }
-  }
-
-  const handleDelete = () => {
-    if (!selectedCafe) {
-      return
-    }
-
-    Modal.confirm({
-      title: 'Delete cafe',
-      content: `Delete ${selectedCafe.name}? This will remove assignments under this cafe.`,
-      okText: 'Delete',
-      okButtonProps: { danger: true },
-      onOk: async () => {
-        try {
-          await deleteCafeMutation.mutateAsync(selectedCafe.id)
-          message.success('Cafe deleted successfully')
-          setSelectedCafe(null)
-        } catch (error) {
-          message.error(getErrorMessage(error))
-        }
-      },
-    })
-  }
 
   return (
     <Space className="page-wrap" direction="vertical" size={16} style={{ width: '100%' }}>
       <Typography.Title className="page-title" level={3} style={{ margin: 0 }}>
         Cafes
       </Typography.Title>
-
-      <Space className="stats-row" size={16} wrap>
-        <Card>
-          <Statistic title="Total Cafes" value={(cafesQuery.data ?? []).length} />
-          <div className="metric-trend" aria-hidden>
-            <span style={{ height: 10 }} />
-            <span style={{ height: 16 }} />
-            <span style={{ height: 12 }} />
-            <span style={{ height: 20 }} />
-            <span style={{ height: 14 }} />
-            <span style={{ height: 18 }} />
-          </div>
-        </Card>
-        <Card>
-          <Statistic title="Assigned Employees" value={totalEmployees} />
-          <div className="metric-trend" aria-hidden>
-            <span style={{ height: 12 }} />
-            <span style={{ height: 18 }} />
-            <span style={{ height: 11 }} />
-            <span style={{ height: 22 }} />
-            <span style={{ height: 15 }} />
-            <span style={{ height: 19 }} />
-          </div>
-        </Card>
-      </Space>
 
       <Card className="toolbar-card">
         <Space className="toolbar" wrap>
@@ -217,14 +159,23 @@ export function CafesPage() {
           <Button onClick={() => void cafesQuery.refetch()} loading={cafesQuery.isFetching && !cafesQuery.isLoading}>
             Refresh
           </Button>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
-            Add Cafe
-          </Button>
-          <Button disabled={!selectedCafe} onClick={() => setEditOpen(true)}>
+          <Button disabled={!selectedCafe} onClick={() => {
+            setEditingCafe(selectedCafe)
+            setEditOpen(true)
+          }}>
             Edit Selected
           </Button>
-          <Button danger disabled={!selectedCafe} onClick={handleDelete}>
+          <Button danger disabled={!selectedCafe} onClick={() => {
+            if (!selectedCafe) {
+              return
+            }
+
+            confirmDeleteCafe(selectedCafe)
+          }}>
             Delete Selected
+          </Button>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
+            Add New Cafe
           </Button>
         </Space>
       </Card>
@@ -248,7 +199,7 @@ export function CafesPage() {
               <AgGridReact<Cafe>
                 rowData={filteredCafes}
                 columnDefs={columnDefs}
-                rowHeight={72}
+                rowHeight={64}
                 defaultColDef={{
                   resizable: true,
                 }}
@@ -257,12 +208,12 @@ export function CafesPage() {
                 loading={cafesQuery.isFetching}
                 onRowClicked={(event) => {
                   const clickedCafe = event.data ?? null
-                  setSelectedCafe((prev) => {
-                    const shouldUnselect = prev?.id === clickedCafe?.id
-                    if (shouldUnselect) {
+                  setSelectedCafe((previousCafe) => {
+                    if (previousCafe?.id === clickedCafe?.id) {
                       event.node.setSelected(false)
                       return null
                     }
+
                     return clickedCafe
                   })
                 }}
@@ -275,99 +226,49 @@ export function CafesPage() {
       <CafeFormModal
         open={createOpen}
         loading={createCafeMutation.isPending}
-        title="Create Cafe"
+        title="Add New Cafe"
         onCancel={() => setCreateOpen(false)}
-        onSubmit={handleCreate}
+        onSubmit={async (payload: CreateCafePayload | UpdateCafePayload) => {
+          try {
+            await createCafeMutation.mutateAsync(payload as CreateCafePayload)
+            message.success('Cafe created successfully')
+            setCreateOpen(false)
+          } catch (error) {
+            message.error(getErrorMessage(error))
+          }
+        }}
       />
 
       <CafeFormModal
         open={editOpen}
         loading={updateCafeMutation.isPending}
-        title="Update Cafe"
+        title="Edit Cafe"
         initialValues={
-          selectedCafe
+          editingCafe
             ? {
-                id: selectedCafe.id,
-                name: selectedCafe.name,
-                description: selectedCafe.description,
-                logo: selectedCafe.logo,
-                location: selectedCafe.location,
+                id: editingCafe.id,
+                name: editingCafe.name,
+                description: editingCafe.description,
+                logo: editingCafe.logo,
+                location: editingCafe.location,
               }
             : undefined
         }
-        onCancel={() => setEditOpen(false)}
-        onSubmit={handleUpdate}
+        onCancel={() => {
+          setEditOpen(false)
+          setEditingCafe(null)
+        }}
+        onSubmit={async (payload: CreateCafePayload | UpdateCafePayload) => {
+          try {
+            await updateCafeMutation.mutateAsync(payload as UpdateCafePayload)
+            message.success('Cafe updated successfully')
+            setEditOpen(false)
+            setEditingCafe(null)
+          } catch (error) {
+            message.error(getErrorMessage(error))
+          }
+        }}
       />
-
-      <Modal
-        open={viewOpen}
-        title={viewedCafe ? viewedCafe.name : 'Cafe'}
-        onCancel={() => setViewOpen(false)}
-        footer={[
-          <Button key="close" type="primary" onClick={() => setViewOpen(false)}>
-            Close
-          </Button>,
-        ]}
-      >
-        <div className="cafe-view-card">
-          {viewedCafe?.logo && (
-            <div className="cafe-view-section" style={{ textAlign: 'center', marginBottom: '24px' }}>
-              <img 
-                src={viewedCafe.logo} 
-                alt={viewedCafe.name} 
-                style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '8px', marginBottom: '16px' }}
-              />
-            </div>
-          )}
-
-          <div className="cafe-view-section">
-            <Typography.Text className="cafe-view-label">Location</Typography.Text>
-            <Typography.Paragraph style={{ marginBottom: '16px' }}>
-              {viewedCafe?.location ?? '-'}
-            </Typography.Paragraph>
-          </div>
-
-          <div className="cafe-view-section">
-            <Typography.Text className="cafe-view-label">Employees</Typography.Text>
-            {employeesQuery.isLoading ? (
-              <div className="cafe-view-value">
-                <Spin size="small" />
-              </div>
-            ) : viewedCafeEmployees.length === 0 ? (
-              <Typography.Paragraph className="cafe-view-empty" style={{ marginBottom: 0 }}>
-                No employees assigned to this cafe.
-              </Typography.Paragraph>
-            ) : (
-              <div className="cafe-view-employee-list">
-                {viewedCafeEmployees.map((employee) => (
-                  <div key={employee.id} className="cafe-view-employee-item" style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <Avatar src={employee.avatar ?? undefined} size={40}>{employee.name.slice(0, 1).toUpperCase()}</Avatar>
-                    <div style={{ flex: 1 }}>
-                      <div className="cafe-view-employee-main">
-                        <Typography.Text className="cafe-view-employee-name">{employee.name}</Typography.Text>
-                        <Typography.Text className="cafe-view-employee-email">{employee.emailAddress}</Typography.Text>
-                      </div>
-                      <div className="cafe-view-employee-meta">
-                        <Tag className="soft-chip">{employee.phoneNumber}</Tag>
-                        <Tag className={employee.daysWorked >= 30 ? 'soft-chip chip-positive' : 'soft-chip chip-warning'}>
-                          {employee.daysWorked} Days
-                        </Tag>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="cafe-view-section">
-            <Typography.Text className="cafe-view-label">Description</Typography.Text>
-            <Typography.Paragraph className="cafe-view-description" style={{ marginBottom: 0, whiteSpace: 'pre-wrap' }}>
-              {viewedCafe?.description ?? 'No description available.'}
-            </Typography.Paragraph>
-          </div>
-        </div>
-      </Modal>
     </Space>
   )
 }

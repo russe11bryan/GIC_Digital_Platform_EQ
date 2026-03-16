@@ -1,8 +1,9 @@
 import { PlusOutlined, SearchOutlined } from '@ant-design/icons'
-import { App, Alert, Avatar, Button, Card, Empty, Input, Modal, Space, Spin, Statistic, Tag, Typography } from 'antd'
+import { App, Alert, Button, Card, Empty, Input, Modal, Space, Spin, Tag, Typography } from 'antd'
 import type { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { EmployeeFormModal } from '../components/EmployeeFormModal'
 import { useCafes } from '../hooks/useCafes'
 import { useCreateEmployee, useDeleteEmployee, useEmployees, useUpdateEmployee } from '../hooks/useEmployees'
@@ -11,67 +12,81 @@ import { getErrorMessage } from '../utils/getErrorMessage'
 
 export function EmployeesPage() {
   const { message } = App.useApp()
-  const [search, setSearch] = useState('')
+  const [searchParams] = useSearchParams()
+  const [search, setSearch] = useState(searchParams.get('cafe') ?? '')
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
-  const [viewedEmployee, setViewedEmployee] = useState<Employee | null>(null)
-  const [viewOpen, setViewOpen] = useState(false)
+  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
-
   const employeesQuery = useEmployees('')
   const cafesQuery = useCafes('')
   const createEmployeeMutation = useCreateEmployee()
   const updateEmployeeMutation = useUpdateEmployee()
   const deleteEmployeeMutation = useDeleteEmployee()
 
+  const confirmDeleteEmployee = useCallback((employee: Employee) => {
+    Modal.confirm({
+      title: 'Delete employee',
+      content: `Delete ${employee.name}?`,
+      okText: 'Delete',
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await deleteEmployeeMutation.mutateAsync(employee.id)
+          message.success('Employee deleted successfully')
+          setSelectedEmployee((current) => (current?.id === employee.id ? null : current))
+          setEditingEmployee((current) => (current?.id === employee.id ? null : current))
+        } catch (error) {
+          message.error(getErrorMessage(error))
+        }
+      },
+    })
+  }, [deleteEmployeeMutation, message])
+
   const filteredEmployees = useMemo(() => {
     const term = search.trim().toLowerCase()
-    if (!term) return employeesQuery.data ?? []
+    if (!term) {
+      return employeesQuery.data ?? []
+    }
+
     return (employeesQuery.data ?? []).filter(
-      (e) =>
-        e.name.toLowerCase().includes(term) ||
-        e.emailAddress.toLowerCase().includes(term) ||
-        e.phoneNumber.toLowerCase().includes(term) ||
-        (e.cafe ?? '').toLowerCase().includes(term),
+      (employee) =>
+        employee.id.toLowerCase().includes(term) ||
+        employee.name.toLowerCase().includes(term) ||
+        employee.emailAddress.toLowerCase().includes(term) ||
+        employee.phoneNumber.toLowerCase().includes(term) ||
+        (employee.cafe ?? '').toLowerCase().includes(term),
     )
   }, [employeesQuery.data, search])
 
   const cafeIdByName = useMemo(() => {
-    const mapping = new Map<string, string>()
+    const map = new Map<string, string>()
     for (const cafe of cafesQuery.data ?? []) {
-      mapping.set(cafe.name, cafe.id)
+      map.set(cafe.name, cafe.id)
     }
-    return mapping
+    return map
   }, [cafesQuery.data])
 
   const columnDefs = useMemo<ColDef<Employee>[]>(
     () => [
       {
+        headerName: 'Employee Id',
+        field: 'id',
+        minWidth: 150,
+        width: 160,
+        sortable: true,
+      },
+      {
         headerName: 'Name',
         field: 'name',
-        minWidth: 240,
+        minWidth: 180,
         flex: 1,
         sortable: true,
-        cellRenderer: ({ data }: { data?: Employee }) => {
-          if (!data) {
-            return null
-          }
-
-          return (
-            <div className="cell-cafe">
-              <Avatar src={data.avatar ?? undefined} size={32}>{data.name.slice(0, 1).toUpperCase()}</Avatar>
-              <div>
-                <div className="cell-title">{data.name}</div>
-                <div className="cell-subtitle">#{data.id}</div>
-              </div>
-            </div>
-          )
-        },
       },
       {
         headerName: 'Email Address',
         field: 'emailAddress',
-        minWidth: 260,
+        minWidth: 240,
         flex: 1.1,
         sortable: true,
       },
@@ -102,114 +117,43 @@ export function EmployeesPage() {
           value ? <Tag className="soft-chip chip-neutral">{value}</Tag> : <Tag className="soft-chip">Unassigned</Tag>,
       },
       {
-        headerName: 'Action',
+        headerName: 'Actions',
         field: 'id',
-        width: 120,
+        width: 180,
         sortable: false,
+        cellRendererParams: {
+          suppressMouseEventHandling: () => true,
+        },
         cellRenderer: ({ data }: { data?: Employee }) => (
-          <button
-            type="button"
-            className="row-action-btn"
-            onClick={(e) => {
-              e.stopPropagation()
-              if (data) {
-                setViewedEmployee(data)
-                setViewOpen(true)
-              }
-            }}
-          >
-            View
-          </button>
+          data ? (
+            <Space size={8}>
+              <Button size="small" onClick={(event) => {
+                event.stopPropagation()
+                setSelectedEmployee(data)
+                setEditingEmployee(data)
+                setEditOpen(true)
+              }}>
+                Edit
+              </Button>
+              <Button size="small" danger onClick={(event) => {
+                event.stopPropagation()
+                confirmDeleteEmployee(data)
+              }}>
+                Delete
+              </Button>
+            </Space>
+          ) : null
         ),
       },
     ],
-    [],
+    [confirmDeleteEmployee],
   )
-
-  const handleCreate = async (payload: CreateEmployeePayload | UpdateEmployeePayload) => {
-    try {
-      await createEmployeeMutation.mutateAsync(payload as CreateEmployeePayload)
-      message.success('Employee created successfully')
-      setCreateOpen(false)
-    } catch (error) {
-      message.error(getErrorMessage(error))
-    }
-  }
-
-  const handleUpdate = async (payload: CreateEmployeePayload | UpdateEmployeePayload) => {
-    try {
-      await updateEmployeeMutation.mutateAsync(payload as UpdateEmployeePayload)
-      message.success('Employee updated successfully')
-      setEditOpen(false)
-    } catch (error) {
-      message.error(getErrorMessage(error))
-    }
-  }
-
-  const handleDelete = () => {
-    if (!selectedEmployee) {
-      return
-    }
-
-    Modal.confirm({
-      title: 'Delete employee',
-      content: `Delete ${selectedEmployee.name}?`,
-      okText: 'Delete',
-      okButtonProps: { danger: true },
-      onOk: async () => {
-        try {
-          await deleteEmployeeMutation.mutateAsync(selectedEmployee.id)
-          message.success('Employee deleted successfully')
-          setSelectedEmployee(null)
-        } catch (error) {
-          message.error(getErrorMessage(error))
-        }
-      },
-    })
-  }
-
-  const selectedEmployeeCafeId = selectedEmployee?.cafe ? cafeIdByName.get(selectedEmployee.cafe) : undefined
 
   return (
     <Space className="page-wrap" direction="vertical" size={16} style={{ width: '100%' }}>
       <Typography.Title className="page-title" level={3} style={{ margin: 0 }}>
         Employees
       </Typography.Title>
-
-      <Space className="stats-row" size={16} wrap>
-        <Card>
-          <Statistic title="Total Employees" value={(employeesQuery.data ?? []).length} />
-          <div className="metric-trend" aria-hidden>
-            <span style={{ height: 11 }} />
-            <span style={{ height: 17 }} />
-            <span style={{ height: 13 }} />
-            <span style={{ height: 20 }} />
-            <span style={{ height: 15 }} />
-            <span style={{ height: 18 }} />
-          </div>
-        </Card>
-        <Card>
-          <Statistic
-            title="Average Days Worked"
-            value={
-              (employeesQuery.data ?? []).length === 0
-                ? 0
-                : Math.round(
-                    (employeesQuery.data ?? []).reduce((sum, employee) => sum + employee.daysWorked, 0) /
-                      (employeesQuery.data ?? []).length,
-                  )
-            }
-          />
-          <div className="metric-trend" aria-hidden>
-            <span style={{ height: 9 }} />
-            <span style={{ height: 14 }} />
-            <span style={{ height: 12 }} />
-            <span style={{ height: 19 }} />
-            <span style={{ height: 16 }} />
-            <span style={{ height: 21 }} />
-          </div>
-        </Card>
-      </Space>
 
       <Card className="toolbar-card">
         <Space className="toolbar" wrap>
@@ -224,14 +168,30 @@ export function EmployeesPage() {
           <Button onClick={() => void employeesQuery.refetch()} loading={employeesQuery.isFetching && !employeesQuery.isLoading}>
             Refresh
           </Button>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)} disabled={(cafesQuery.data ?? []).length === 0}>
-            Add Employee
-          </Button>
-          <Button disabled={!selectedEmployee} onClick={() => setEditOpen(true)}>
+          <Button
+            disabled={!selectedEmployee}
+            onClick={() => {
+              setEditingEmployee(selectedEmployee)
+              setEditOpen(true)
+            }}
+          >
             Edit Selected
           </Button>
-          <Button danger disabled={!selectedEmployee} onClick={handleDelete}>
+          <Button danger disabled={!selectedEmployee} onClick={() => {
+            if (!selectedEmployee) {
+              return
+            }
+
+            confirmDeleteEmployee(selectedEmployee)
+          }}>
             Delete Selected
+          </Button>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setCreateOpen(true)}
+          >
+            Add New Employee
           </Button>
         </Space>
       </Card>
@@ -260,7 +220,7 @@ export function EmployeesPage() {
               <AgGridReact<Employee>
                 rowData={filteredEmployees}
                 columnDefs={columnDefs}
-                rowHeight={72}
+                rowHeight={64}
                 defaultColDef={{
                   resizable: true,
                 }}
@@ -269,12 +229,12 @@ export function EmployeesPage() {
                 loading={employeesQuery.isFetching}
                 onRowClicked={(event) => {
                   const clickedEmployee = event.data ?? null
-                  setSelectedEmployee((prev) => {
-                    const shouldUnselect = prev?.id === clickedEmployee?.id
-                    if (shouldUnselect) {
+                  setSelectedEmployee((previousEmployee) => {
+                    if (previousEmployee?.id === clickedEmployee?.id) {
                       event.node.setSelected(false)
                       return null
                     }
+
                     return clickedEmployee
                   })
                 }}
@@ -288,93 +248,51 @@ export function EmployeesPage() {
         cafes={cafesQuery.data ?? []}
         open={createOpen}
         loading={createEmployeeMutation.isPending}
-        title="Create Employee"
+        title="Add New Employee"
         onCancel={() => setCreateOpen(false)}
-        onSubmit={handleCreate}
+        onSubmit={async (payload: CreateEmployeePayload | UpdateEmployeePayload) => {
+          try {
+            await createEmployeeMutation.mutateAsync(payload as CreateEmployeePayload)
+            message.success('Employee created successfully')
+            setCreateOpen(false)
+          } catch (error) {
+            message.error(getErrorMessage(error))
+          }
+        }}
       />
 
       <EmployeeFormModal
         cafes={cafesQuery.data ?? []}
         open={editOpen}
         loading={updateEmployeeMutation.isPending}
-        title="Update Employee"
+        title="Edit Employee"
         initialValues={
-          selectedEmployee && selectedEmployeeCafeId
+          editingEmployee
             ? {
-                id: selectedEmployee.id,
-                name: selectedEmployee.name,
-                emailAddress: selectedEmployee.emailAddress,
-                phoneNumber: selectedEmployee.phoneNumber,
-                gender: 'Male',
-                cafeId: selectedEmployeeCafeId,
+                id: editingEmployee.id,
+                name: editingEmployee.name,
+                emailAddress: editingEmployee.emailAddress,
+                phoneNumber: editingEmployee.phoneNumber,
+                gender: editingEmployee.gender,
+                cafeId: editingEmployee.cafeId ?? (editingEmployee.cafe ? cafeIdByName.get(editingEmployee.cafe) : undefined),
               }
             : undefined
         }
-        onCancel={() => setEditOpen(false)}
-        onSubmit={handleUpdate}
+        onCancel={() => {
+          setEditOpen(false)
+          setEditingEmployee(null)
+        }}
+        onSubmit={async (payload: CreateEmployeePayload | UpdateEmployeePayload) => {
+          try {
+            await updateEmployeeMutation.mutateAsync(payload as UpdateEmployeePayload)
+            message.success('Employee updated successfully')
+            setEditOpen(false)
+            setEditingEmployee(null)
+          } catch (error) {
+            message.error(getErrorMessage(error))
+          }
+        }}
       />
-
-      <Modal
-        open={viewOpen}
-        title={viewedEmployee ? viewedEmployee.name : 'Employee'}
-        onCancel={() => setViewOpen(false)}
-        footer={[
-          <Button key="close" type="primary" onClick={() => setViewOpen(false)}>
-            Close
-          </Button>,
-        ]}
-      >
-        <div className="cafe-view-card">
-          {viewedEmployee?.avatar && (
-            <div className="cafe-view-section" style={{ textAlign: 'center', marginBottom: '24px' }}>
-              <img 
-                src={viewedEmployee.avatar} 
-                alt={viewedEmployee.name} 
-                style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '50%', marginBottom: '16px' }}
-              />
-            </div>
-          )}
-
-          <div className="cafe-view-section">
-            <Typography.Text className="cafe-view-label">Employee Details</Typography.Text>
-            <div className="employee-view-grid">
-              <div className="employee-view-item">
-                <Typography.Text className="employee-view-key">ID</Typography.Text>
-                <Typography.Text className="employee-view-value">{viewedEmployee?.id ?? '-'}</Typography.Text>
-              </div>
-              <div className="employee-view-item">
-                <Typography.Text className="employee-view-key">Email</Typography.Text>
-                <Typography.Text className="employee-view-value">{viewedEmployee?.emailAddress ?? '-'}</Typography.Text>
-              </div>
-              <div className="employee-view-item">
-                <Typography.Text className="employee-view-key">Phone</Typography.Text>
-                <Typography.Text className="employee-view-value">{viewedEmployee?.phoneNumber ?? '-'}</Typography.Text>
-              </div>
-              <div className="employee-view-item">
-                <Typography.Text className="employee-view-key">Cafe</Typography.Text>
-                <Typography.Text className="employee-view-value">{viewedEmployee?.cafe ?? 'Unassigned'}</Typography.Text>
-              </div>
-            </div>
-          </div>
-
-          <div className="cafe-view-section">
-            <Typography.Text className="cafe-view-label">Work Summary</Typography.Text>
-            <div className="cafe-view-value">
-              <Tag
-                className={
-                  (viewedEmployee?.daysWorked ?? 0) >= 30
-                    ? 'soft-chip chip-positive'
-                    : (viewedEmployee?.daysWorked ?? 0) >= 14
-                      ? 'soft-chip chip-warning'
-                      : 'soft-chip'
-                }
-              >
-                {viewedEmployee?.daysWorked ?? 0} Days Worked
-              </Tag>
-            </div>
-          </div>
-        </div>
-      </Modal>
     </Space>
   )
 }

@@ -11,7 +11,7 @@ public class UpdateEmployeeCommandValidator : AbstractValidator<UpdateEmployeeCo
 
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Name is required")
-            .Length(6, 50).WithMessage("Name must be between 6 and 50 characters");
+            .Length(6, 10).WithMessage("Name must be between 6 and 10 characters");
 
         RuleFor(x => x.EmailAddress)
             .NotEmpty().WithMessage("Email is required")
@@ -26,11 +26,5 @@ public class UpdateEmployeeCommandValidator : AbstractValidator<UpdateEmployeeCo
             .NotEmpty().WithMessage("Gender is required")
             .Must(g => g == "Male" || g == "Female").WithMessage("Gender must be Male or Female");
 
-        RuleFor(x => x.CafeId)
-            .NotEmpty().WithMessage("Cafe selection is required");
-
-        RuleFor(x => x.Avatar)
-            .MaximumLength(5242880).WithMessage("Avatar must not exceed 5MB")
-            .When(x => !string.IsNullOrEmpty(x.Avatar));
     }
 }

@@ -16,13 +16,15 @@ public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeComman
 
     public async Task<string> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
     {
-        // Verify cafe exists
-        var cafeExists = await _context.Cafes
-            .AnyAsync(c => c.Id == request.CafeId, cancellationToken);
-
-        if (!cafeExists)
+        if (request.CafeId.HasValue)
         {
-            throw new KeyNotFoundException($"Cafe with ID {request.CafeId} not found");
+            var cafeExists = await _context.Cafes
+                .AnyAsync(c => c.Id == request.CafeId.Value, cancellationToken);
+
+            if (!cafeExists)
+            {
+                throw new KeyNotFoundException($"Cafe with ID {request.CafeId} not found");
+            }
         }
 
         // Generate employee ID (UIXXXXXXX format)
@@ -34,19 +36,22 @@ public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeComman
             Name = request.Name,
             EmailAddress = request.EmailAddress,
             PhoneNumber = request.PhoneNumber,
-            Gender = request.Gender,
-            Avatar = request.Avatar
-        };
-
-        var employeeCafe = new EmployeeCafe
-        {
-            EmployeeId = employeeId,
-            CafeId = request.CafeId,
-            StartDate = DateTime.UtcNow
+            Gender = request.Gender
         };
 
         _context.Employees.Add(employee);
-        _context.EmployeeCafes.Add(employeeCafe);
+
+        if (request.CafeId.HasValue)
+        {
+            var employeeCafe = new EmployeeCafe
+            {
+                EmployeeId = employeeId,
+                CafeId = request.CafeId.Value,
+                StartDate = DateTime.UtcNow
+            };
+            _context.EmployeeCafes.Add(employeeCafe);
+        }
+
         await _context.SaveChangesAsync(cancellationToken);
 
         return employee.Id;
