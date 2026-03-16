@@ -21,7 +21,7 @@ public class UpdateCafeCommandValidator : AbstractValidator<UpdateCafeCommand>
             .NotEmpty().WithMessage("Location is required");
 
         RuleFor(x => x.Logo)
-            .MaximumLength(500).WithMessage("Logo URL must not exceed 500 characters")
+            .MaximumLength(5242880).WithMessage("Logo must not exceed 5MB")
             .When(x => !string.IsNullOrEmpty(x.Logo));
     }
 }

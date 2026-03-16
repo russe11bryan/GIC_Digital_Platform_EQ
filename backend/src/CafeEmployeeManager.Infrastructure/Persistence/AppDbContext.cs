@@ -24,7 +24,7 @@ public class AppDbContext : DbContext, IAppDbContext
             entity.Property(x => x.Name).IsRequired().HasMaxLength(50);
             entity.Property(x => x.Description).IsRequired().HasMaxLength(256);
             entity.Property(x => x.Location).IsRequired().HasMaxLength(100);
-            entity.Property(x => x.Logo).HasMaxLength(500);
+            entity.Property(x => x.Logo).HasMaxLength(5242880); // ~5MB for base64 encoded image
         });
 
         modelBuilder.Entity<Employee>(entity =>
