@@ -1,4 +1,3 @@
-/Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Infrastructure/obj/Debug/net10.0/CafeEmployeeManager.Infrastructure.csproj.AssemblyReference.cache
 /Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Infrastructure/bin/Debug/net10.0/CafeEmployeeManager.Infrastructure.deps.json
 /Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Infrastructure/bin/Debug/net10.0/CafeEmployeeManager.Infrastructure.runtimeconfig.json
 /Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Infrastructure/bin/Debug/net10.0/CafeEmployeeManager.Infrastructure.dll
@@ -7,6 +6,7 @@
 /Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Infrastructure/bin/Debug/net10.0/CafeEmployeeManager.Domain.dll
 /Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Infrastructure/bin/Debug/net10.0/CafeEmployeeManager.Application.pdb
 /Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Infrastructure/bin/Debug/net10.0/CafeEmployeeManager.Domain.pdb
+/Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Infrastructure/obj/Debug/net10.0/CafeEmployeeManager.Infrastructure.csproj.AssemblyReference.cache
 /Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Infrastructure/obj/Debug/net10.0/CafeEmployeeManager.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
 /Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Infrastructure/obj/Debug/net10.0/CafeEmployeeManager.Infrastructure.AssemblyInfoInputs.cache
 /Users/russellbryan/Documents/GitHub/GIC 2026/gic-cafe-employee-manager/backend/src/CafeEmployeeManager.Infrastructure/obj/Debug/net10.0/CafeEmployeeManager.Infrastructure.AssemblyInfo.cs
