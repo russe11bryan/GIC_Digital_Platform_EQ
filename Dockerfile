@@ -1,17 +1,16 @@
 # Build frontend
-# Force rebuild
 FROM node:22-alpine AS frontend-build
 WORKDIR /app
-
-ARG BUILD_DATE=unknown
-RUN echo "Build date: $BUILD_DATE"
 
 COPY frontend/package*.json ./
 RUN npm ci
 
 COPY frontend/ .
-ARG VITE_API_BASE_URL=/api
+
+# Build with API base URL - use arg with default fallback
+ARG VITE_API_BASE_URL=https://gic-backend-production.up.railway.app/api
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+
 RUN npm run build
 
 # Final stage - serve frontend with nginx
