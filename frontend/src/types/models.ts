@@ -12,10 +12,14 @@ export type Employee = {
   name: string
   emailAddress: string
   phoneNumber: string
-  gender: 'Male' | 'Female'
+  gender?: 'Male' | 'Female'
   daysWorked: number
   cafe: string | null
   cafeId?: string | null
+}
+
+export type EmployeeEditState = {
+  employee: Employee
 }
 
 export type CreateCafePayload = {

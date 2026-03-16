@@ -1,6 +1,7 @@
 using CafeEmployeeManager.Application.Employees.Commands.CreateEmployee;
 using CafeEmployeeManager.Application.Employees.Commands.DeleteEmployee;
 using CafeEmployeeManager.Application.Employees.Commands.UpdateEmployee;
+using CafeEmployeeManager.Application.Employees.Queries.GetEmployeeById;
 using CafeEmployeeManager.Application.Employees.Queries.GetEmployees;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +25,19 @@ public class EmployeesController : ControllerBase
     {
         var query = new GetEmployeesQuery(cafe);
         var result = await _mediator.Send(query);
+        return Ok(result);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<EmployeeDto>> GetEmployee(string id)
+    {
+        var result = await _mediator.Send(new GetEmployeeByIdQuery(id));
+
+        if (result is null)
+        {
+            return NotFound();
+        }
+
         return Ok(result);
     }
 
@@ -54,7 +68,7 @@ public class EmployeesController : ControllerBase
     }
 
     [HttpDelete]
-    public async Task<ActionResult> DeleteEmployee([FromQuery] string id)
+    public async Task<ActionResult> DeleteEmployeeByQuery([FromQuery] string id)
     {
         await _mediator.Send(new DeleteEmployeeCommand(id));
         return NoContent();

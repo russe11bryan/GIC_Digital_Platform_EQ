@@ -5,7 +5,7 @@ import { AgGridReact } from 'ag-grid-react'
 import { useCallback, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useDeleteEmployee, useEmployees } from '../hooks/useEmployees'
-import type { Employee } from '../types/models'
+import type { Employee, EmployeeEditState } from '../types/models'
 import { getErrorMessage } from '../utils/getErrorMessage'
 
 export function EmployeesPage() {
@@ -96,7 +96,11 @@ export function EmployeesPage() {
             <Space size={8}>
               <Button size="small" onClick={(event) => {
                 event.stopPropagation()
-                navigate(`/employees/${data.id}/edit`)
+                navigate(`/employees/${data.id}/edit`, {
+                  state: {
+                    employee: data,
+                  } satisfies EmployeeEditState,
+                })
               }}>
                 Edit
               </Button>

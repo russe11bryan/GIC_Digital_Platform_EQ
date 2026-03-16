@@ -1,11 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createEmployee, deleteEmployee, getEmployees, updateEmployee } from '../api/employees'
+import { createEmployee, deleteEmployee, getEmployee, getEmployees, updateEmployee } from '../api/employees'
 import type { CreateEmployeePayload, UpdateEmployeePayload } from '../types/models'
 
 export function useEmployees(cafeFilter: string) {
   return useQuery({
     queryKey: ['employees', cafeFilter],
     queryFn: () => getEmployees(cafeFilter || undefined),
+  })
+}
+
+export function useEmployee(id?: string) {
+  return useQuery({
+    queryKey: ['employee', id],
+    queryFn: () => getEmployee(id!),
+    enabled: Boolean(id),
   })
 }
 

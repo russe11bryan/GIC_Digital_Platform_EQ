@@ -54,7 +54,7 @@ public class CafesController : ControllerBase
     }
 
     [HttpDelete]
-    public async Task<ActionResult> DeleteCafe([FromQuery] Guid id)
+    public async Task<ActionResult> DeleteCafeByQuery([FromQuery] Guid id)
     {
         await _mediator.Send(new DeleteCafeCommand(id));
         return NoContent();
