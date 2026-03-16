@@ -48,24 +48,33 @@ var app = builder.Build();
 // Initialize database with seed data
 try
 {
-    using (var scope = app.Services.CreateScope())
+    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+    if (!string.IsNullOrEmpty(databaseUrl))
     {
-        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        Console.WriteLine("Starting database initialization...");
-        
-        // Create database and schema from DbContext model
-        dbContext.Database.EnsureCreated();
-        Console.WriteLine("Database schema ensured.");
-        
-        // Seed initial data
-        Console.WriteLine("Starting database seeding...");
-        SeedData.InitializeAsync(dbContext).GetAwaiter().GetResult();
-        Console.WriteLine("Database initialization completed successfully.");
+        using (var scope = app.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            Console.WriteLine("Starting database initialization...");
+            
+            // Create database and schema from DbContext model
+            dbContext.Database.EnsureCreated();
+            Console.WriteLine("Database schema ensured.");
+            
+            // Seed initial data
+            Console.WriteLine("Starting database seeding...");
+            SeedData.InitializeAsync(dbContext).GetAwaiter().GetResult();
+            Console.WriteLine("Database initialization completed successfully.");
+        }
+    }
+    else
+    {
+        Console.WriteLine("DATABASE_URL not set - skipping database initialization");
     }
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"Error during database initialization: {ex}");
+    Console.WriteLine($"Error during database initialization: {ex.Message}");
+    Console.WriteLine($"Stack trace: {ex.StackTrace}");
     // Don't throw - allow app to start even if seeding fails
 }
 
@@ -80,7 +89,8 @@ app.UseCors(FrontendCorsPolicy);
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Add health check endpoint
-app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
+app.MapGet("/", () => Results.Ok(new { message = "API is running", endpoints = new { health = "/health", cafes = "/api/cafes" } }));
 
 app.UseHttpsRedirection();
 app.MapControllers();
