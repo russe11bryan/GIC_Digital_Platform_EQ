@@ -1,8 +1,7 @@
 {
-  "root": "frontend",
-  "buildCommand": "npm install && npm run build",
-  "outputDirectory": "dist",
-  "framework": "vite",
+  "buildCommand": "cd frontend && npm ci && npm run build",
+  "outputDirectory": "frontend/dist",
   "nodeVersion": "20.x"
 }
+
 
