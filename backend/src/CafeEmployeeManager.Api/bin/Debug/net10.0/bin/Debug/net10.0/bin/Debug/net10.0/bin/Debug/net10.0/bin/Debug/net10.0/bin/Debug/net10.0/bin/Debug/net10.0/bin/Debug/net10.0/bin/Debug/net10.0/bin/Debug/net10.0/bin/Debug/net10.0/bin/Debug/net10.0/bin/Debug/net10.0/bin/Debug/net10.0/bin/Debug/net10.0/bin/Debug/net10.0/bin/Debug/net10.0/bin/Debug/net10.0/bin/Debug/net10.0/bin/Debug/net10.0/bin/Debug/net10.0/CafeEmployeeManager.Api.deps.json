@@ -46,17 +46,6 @@
           }
         }
       },
-      "FluentValidation.DependencyInjectionExtensions/12.1.1": {
-        "dependencies": {
-          "FluentValidation": "12.1.1"
-        },
-        "runtime": {
-          "lib/net8.0/FluentValidation.DependencyInjectionExtensions.dll": {
-            "assemblyVersion": "12.0.0.0",
-            "fileVersion": "12.1.1.0"
-          }
-        }
-      },
       "Humanizer.Core/2.14.1": {
         "runtime": {
           "lib/net6.0/Humanizer.dll": {
@@ -376,22 +365,22 @@
           }
         }
       },
-      "Microsoft.EntityFrameworkCore/10.0.4": {
+      "Microsoft.EntityFrameworkCore/10.0.3": {
         "dependencies": {
-          "Microsoft.EntityFrameworkCore.Abstractions": "10.0.4"
+          "Microsoft.EntityFrameworkCore.Abstractions": "10.0.3"
         },
         "runtime": {
           "lib/net10.0/Microsoft.EntityFrameworkCore.dll": {
-            "assemblyVersion": "10.0.4.0",
-            "fileVersion": "10.0.426.12010"
+            "assemblyVersion": "10.0.3.0",
+            "fileVersion": "10.0.326.7603"
           }
         }
       },
-      "Microsoft.EntityFrameworkCore.Abstractions/10.0.4": {
+      "Microsoft.EntityFrameworkCore.Abstractions/10.0.3": {
         "runtime": {
           "lib/net10.0/Microsoft.EntityFrameworkCore.Abstractions.dll": {
-            "assemblyVersion": "10.0.4.0",
-            "fileVersion": "10.0.426.12010"
+            "assemblyVersion": "10.0.3.0",
+            "fileVersion": "10.0.326.7603"
           }
         }
       },
@@ -416,7 +405,7 @@
       },
       "Microsoft.EntityFrameworkCore.Relational/10.0.3": {
         "dependencies": {
-          "Microsoft.EntityFrameworkCore": "10.0.4"
+          "Microsoft.EntityFrameworkCore": "10.0.3"
         },
         "runtime": {
           "lib/net10.0/Microsoft.EntityFrameworkCore.Relational.dll": {
@@ -519,7 +508,7 @@
       },
       "Npgsql.EntityFrameworkCore.PostgreSQL/10.0.0": {
         "dependencies": {
-          "Microsoft.EntityFrameworkCore": "10.0.4",
+          "Microsoft.EntityFrameworkCore": "10.0.3",
           "Microsoft.EntityFrameworkCore.Relational": "10.0.3",
           "Npgsql": "10.0.0"
         },
@@ -639,9 +628,7 @@
         "dependencies": {
           "CafeEmployeeManager.Domain": "1.0.0",
           "FluentValidation": "12.1.1",
-          "FluentValidation.DependencyInjectionExtensions": "12.1.1",
-          "MediatR": "14.1.0",
-          "Microsoft.EntityFrameworkCore": "10.0.4"
+          "MediatR": "14.1.0"
         },
         "runtime": {
           "CafeEmployeeManager.Application.dll": {
@@ -662,7 +649,7 @@
         "dependencies": {
           "CafeEmployeeManager.Application": "1.0.0",
           "CafeEmployeeManager.Domain": "1.0.0",
-          "Microsoft.EntityFrameworkCore": "10.0.4",
+          "Microsoft.EntityFrameworkCore": "10.0.3",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "10.0.0"
         },
         "runtime": {
@@ -700,13 +687,6 @@
       "sha512": "sha512-EPpkIe1yh1a0OXyC100oOA8WMbZvqUu5plwhvYcb7oSELfyUZzfxV48BLhvs3kKo4NwG7MGLNgy1RJiYtT8Dpw==",
       "path": "fluentvalidation/12.1.1",
       "hashPath": "fluentvalidation.12.1.1.nupkg.sha512"
-    },
-    "FluentValidation.DependencyInjectionExtensions/12.1.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-D0VXh4dtjjX2aQizuaa0g6R8X3U1JaVqJPfGCvLwZX9t/O2h7tkpbitbadQMfwcgSPdDbI2vDxuwRMv/Uf9dHA==",
-      "path": "fluentvalidation.dependencyinjectionextensions/12.1.1",
-      "hashPath": "fluentvalidation.dependencyinjectionextensions.12.1.1.nupkg.sha512"
     },
     "Humanizer.Core/2.14.1": {
       "type": "package",
@@ -778,19 +758,19 @@
       "path": "microsoft.codeanalysis.workspaces.msbuild/5.0.0",
       "hashPath": "microsoft.codeanalysis.workspaces.msbuild.5.0.0.nupkg.sha512"
     },
-    "Microsoft.EntityFrameworkCore/10.0.4": {
+    "Microsoft.EntityFrameworkCore/10.0.3": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-kzTsfFK2GCytp6DDTfQOmxPU4gbGdrIlP7PxrxF3ESNLtfXrC8BoUVZENBN2WORlZPAD7CVX6AYIglgkpXQooA==",
-      "path": "microsoft.entityframeworkcore/10.0.4",
-      "hashPath": "microsoft.entityframeworkcore.10.0.4.nupkg.sha512"
+      "sha512": "sha512-CDEImwD4A7BseABJMCpLZnhfFjmPY/bHwhhS70elc6gLI/bYUEOhxWt7PmaNGYGhIEzOnStlCy5QcVb+8dod5Q==",
+      "path": "microsoft.entityframeworkcore/10.0.3",
+      "hashPath": "microsoft.entityframeworkcore.10.0.3.nupkg.sha512"
     },
-    "Microsoft.EntityFrameworkCore.Abstractions/10.0.4": {
+    "Microsoft.EntityFrameworkCore.Abstractions/10.0.3": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-qDcJqCfN1XYyX0ID/Hd9/kQTRvlia8S+Yuwyl9uFhBIKnOCbl9WMdGQCzbZUKbkpkfvf3P9CDdXsnxHyE3O0Aw==",
-      "path": "microsoft.entityframeworkcore.abstractions/10.0.4",
-      "hashPath": "microsoft.entityframeworkcore.abstractions.10.0.4.nupkg.sha512"
+      "sha512": "sha512-c7Uoz381xnMHNBRB8eHRhGgzUtXbgddlbODhwZRrTSzZWDharp3RkJsFwhxyESbeXhCqmML7VdvjMQ7uu+HreA==",
+      "path": "microsoft.entityframeworkcore.abstractions/10.0.3",
+      "hashPath": "microsoft.entityframeworkcore.abstractions.10.0.3.nupkg.sha512"
     },
     "Microsoft.EntityFrameworkCore.Design/10.0.3": {
       "type": "package",

@@ -2,7 +2,6 @@ import {
   BellOutlined,
   DashboardOutlined,
   QuestionCircleOutlined,
-  SettingOutlined,
   ShopOutlined,
   TeamOutlined,
   UserOutlined,
@@ -15,7 +14,6 @@ import { DashboardPage } from './pages/DashboardPage'
 import { EmployeesPage } from './pages/EmployeesPage'
 import { HelpSupportPage } from './pages/HelpSupportPage'
 import { NotificationsPage } from './pages/NotificationsPage'
-import { SettingsPage } from './pages/SettingsPage'
 import './App.css'
 
 const { Sider, Header, Content } = Layout
@@ -42,7 +40,6 @@ function AppShell() {
             { key: '/cafes', icon: <ShopOutlined />, label: 'Cafes' },
             { key: '/employees', icon: <TeamOutlined />, label: 'Employees' },
             { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
-            { key: '/settings', icon: <SettingOutlined />, label: 'Settings' },
           ]}
         />
 
@@ -79,7 +76,6 @@ function AppShell() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/cafes" element={<CafesPage />} />
             <Route path="/employees" element={<EmployeesPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/account" element={<AccountPage />} />
             <Route path="/help-support" element={<HelpSupportPage />} />
