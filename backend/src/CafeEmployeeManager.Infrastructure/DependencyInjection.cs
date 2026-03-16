@@ -3,6 +3,7 @@ using CafeEmployeeManager.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 
 namespace CafeEmployeeManager.Infrastructure;
 
@@ -13,9 +14,29 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-        var connectionString = !string.IsNullOrEmpty(databaseUrl)
-            ? databaseUrl
-            : configuration.GetConnectionString("DefaultConnection");
+        string connectionString;
+
+        if (!string.IsNullOrEmpty(databaseUrl))
+        {
+            // Convert postgresql:// URL to Npgsql connection string
+            // Format: postgresql://user:password@host:port/database
+            var uri = new Uri(databaseUrl);
+            var builder = new NpgsqlConnectionStringBuilder
+            {
+                Host = uri.Host,
+                Port = uri.Port == -1 ? 5432 : uri.Port,
+                Database = uri.AbsolutePath.TrimStart('/'),
+                Username = uri.UserInfo?.Split(':')[0] ?? "postgres",
+                Password = uri.UserInfo?.Split(':')[1] ?? "",
+                TrustServerCertificate = true,
+                SslMode = SslMode.Require
+            };
+            connectionString = builder.ConnectionString;
+        }
+        else
+        {
+            connectionString = configuration.GetConnectionString("DefaultConnection");
+        }
 
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(connectionString));
