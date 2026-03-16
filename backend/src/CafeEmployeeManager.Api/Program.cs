@@ -46,27 +46,27 @@ builder.Services.AddInfrastructure(builder.Configuration);
 var app = builder.Build();
 
 // Initialize database with seed data
-using (var scope = app.Services.CreateScope())
+try
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    try
+    using (var scope = app.Services.CreateScope())
     {
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Console.WriteLine("Starting database initialization...");
         
         // Create database and schema from DbContext model
-        await dbContext.Database.EnsureCreatedAsync();
+        dbContext.Database.EnsureCreated();
         Console.WriteLine("Database schema ensured.");
         
         // Seed initial data
         Console.WriteLine("Starting database seeding...");
-        await SeedData.InitializeAsync(dbContext);
+        SeedData.InitializeAsync(dbContext).GetAwaiter().GetResult();
         Console.WriteLine("Database initialization completed successfully.");
     }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error during database initialization: {ex}");
-        throw;
-    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Error during database initialization: {ex}");
+    // Don't throw - allow app to start even if seeding fails
 }
 
 if (app.Environment.IsDevelopment())
