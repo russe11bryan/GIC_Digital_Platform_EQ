@@ -34,7 +34,8 @@ public class CreateEmployeeCommandHandler : IRequestHandler<CreateEmployeeComman
             Name = request.Name,
             EmailAddress = request.EmailAddress,
             PhoneNumber = request.PhoneNumber,
-            Gender = request.Gender
+            Gender = request.Gender,
+            Avatar = request.Avatar
         };
 
         var employeeCafe = new EmployeeCafe

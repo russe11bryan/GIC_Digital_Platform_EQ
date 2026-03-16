@@ -39,6 +39,10 @@ public class UpdateEmployeeCommandHandler : IRequestHandler<UpdateEmployeeComman
         employee.EmailAddress = request.EmailAddress;
         employee.PhoneNumber = request.PhoneNumber;
         employee.Gender = request.Gender;
+        if (request.Avatar != null)
+        {
+            employee.Avatar = request.Avatar;
+        }
 
         // Update cafe assignment
         if (employee.EmployeeCafe != null)

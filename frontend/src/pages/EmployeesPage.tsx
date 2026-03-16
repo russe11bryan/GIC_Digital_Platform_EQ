@@ -59,7 +59,7 @@ export function EmployeesPage() {
 
           return (
             <div className="cell-cafe">
-              <Avatar size={32}>{data.name.slice(0, 1).toUpperCase()}</Avatar>
+              <Avatar src={data.avatar ?? undefined} size={32}>{data.name.slice(0, 1).toUpperCase()}</Avatar>
               <div>
                 <div className="cell-title">{data.name}</div>
                 <div className="cell-subtitle">#{data.id}</div>
@@ -325,6 +325,16 @@ export function EmployeesPage() {
         ]}
       >
         <div className="cafe-view-card">
+          {viewedEmployee?.avatar && (
+            <div className="cafe-view-section" style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <img 
+                src={viewedEmployee.avatar} 
+                alt={viewedEmployee.name} 
+                style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '50%', marginBottom: '16px' }}
+              />
+            </div>
+          )}
+
           <div className="cafe-view-section">
             <Typography.Text className="cafe-view-label">Employee Details</Typography.Text>
             <div className="employee-view-grid">

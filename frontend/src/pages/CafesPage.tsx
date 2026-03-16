@@ -310,6 +310,23 @@ export function CafesPage() {
         ]}
       >
         <div className="cafe-view-card">
+          {viewedCafe?.logo && (
+            <div className="cafe-view-section" style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <img 
+                src={viewedCafe.logo} 
+                alt={viewedCafe.name} 
+                style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '8px', marginBottom: '16px' }}
+              />
+            </div>
+          )}
+
+          <div className="cafe-view-section">
+            <Typography.Text className="cafe-view-label">Location</Typography.Text>
+            <Typography.Paragraph style={{ marginBottom: '16px' }}>
+              {viewedCafe?.location ?? '-'}
+            </Typography.Paragraph>
+          </div>
+
           <div className="cafe-view-section">
             <Typography.Text className="cafe-view-label">Employees</Typography.Text>
             {employeesQuery.isLoading ? (
@@ -323,16 +340,19 @@ export function CafesPage() {
             ) : (
               <div className="cafe-view-employee-list">
                 {viewedCafeEmployees.map((employee) => (
-                  <div key={employee.id} className="cafe-view-employee-item">
-                    <div className="cafe-view-employee-main">
-                      <Typography.Text className="cafe-view-employee-name">{employee.name}</Typography.Text>
-                      <Typography.Text className="cafe-view-employee-email">{employee.emailAddress}</Typography.Text>
-                    </div>
-                    <div className="cafe-view-employee-meta">
-                      <Tag className="soft-chip">{employee.phoneNumber}</Tag>
-                      <Tag className={employee.daysWorked >= 30 ? 'soft-chip chip-positive' : 'soft-chip chip-warning'}>
-                        {employee.daysWorked} Days
-                      </Tag>
+                  <div key={employee.id} className="cafe-view-employee-item" style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                    <Avatar src={employee.avatar ?? undefined} size={40}>{employee.name.slice(0, 1).toUpperCase()}</Avatar>
+                    <div style={{ flex: 1 }}>
+                      <div className="cafe-view-employee-main">
+                        <Typography.Text className="cafe-view-employee-name">{employee.name}</Typography.Text>
+                        <Typography.Text className="cafe-view-employee-email">{employee.emailAddress}</Typography.Text>
+                      </div>
+                      <div className="cafe-view-employee-meta">
+                        <Tag className="soft-chip">{employee.phoneNumber}</Tag>
+                        <Tag className={employee.daysWorked >= 30 ? 'soft-chip chip-positive' : 'soft-chip chip-warning'}>
+                          {employee.daysWorked} Days
+                        </Tag>
+                      </div>
                     </div>
                   </div>
                 ))}

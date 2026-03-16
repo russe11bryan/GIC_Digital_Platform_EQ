@@ -8,4 +8,5 @@ public class EmployeeDto
     public string PhoneNumber { get; set; } = default!;
     public int DaysWorked { get; set; }
     public string? Cafe { get; set; }
+    public string? Avatar { get; set; }
 }

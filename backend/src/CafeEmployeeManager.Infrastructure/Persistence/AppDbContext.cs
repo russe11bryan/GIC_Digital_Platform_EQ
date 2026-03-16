@@ -35,6 +35,7 @@ public class AppDbContext : DbContext, IAppDbContext
             entity.Property(x => x.EmailAddress).IsRequired().HasMaxLength(100);
             entity.Property(x => x.PhoneNumber).IsRequired().HasMaxLength(8);
             entity.Property(x => x.Gender).IsRequired().HasMaxLength(10);
+            entity.Property(x => x.Avatar).HasMaxLength(5242880); // ~5MB for base64 encoded image
         });
 
         modelBuilder.Entity<EmployeeCafe>(entity =>

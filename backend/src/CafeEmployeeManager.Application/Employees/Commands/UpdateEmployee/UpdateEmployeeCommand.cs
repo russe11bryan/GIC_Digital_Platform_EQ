@@ -8,5 +8,6 @@ public record UpdateEmployeeCommand(
     string EmailAddress,
     string PhoneNumber,
     string Gender,
-    Guid CafeId
+    Guid CafeId,
+    string? Avatar = null
 ) : IRequest<Unit>;

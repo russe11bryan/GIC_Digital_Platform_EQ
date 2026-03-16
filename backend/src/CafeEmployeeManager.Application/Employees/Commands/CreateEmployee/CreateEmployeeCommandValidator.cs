@@ -25,5 +25,9 @@ public class CreateEmployeeCommandValidator : AbstractValidator<CreateEmployeeCo
 
         RuleFor(x => x.CafeId)
             .NotEmpty().WithMessage("Cafe selection is required");
+
+        RuleFor(x => x.Avatar)
+            .MaximumLength(5242880).WithMessage("Avatar must not exceed 5MB")
+            .When(x => !string.IsNullOrEmpty(x.Avatar));
     }
 }

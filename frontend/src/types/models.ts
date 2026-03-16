@@ -14,6 +14,7 @@ export type Employee = {
   phoneNumber: string
   daysWorked: number
   cafe: string | null
+  avatar: string | null
 }
 
 export type CreateCafePayload = {
@@ -33,6 +34,7 @@ export type CreateEmployeePayload = {
   phoneNumber: string
   gender: 'Male' | 'Female'
   cafeId: string
+  avatar?: string | null
 }
 
 export type UpdateEmployeePayload = CreateEmployeePayload & {

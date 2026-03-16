@@ -7,5 +7,6 @@ public record CreateEmployeeCommand(
     string EmailAddress,
     string PhoneNumber,
     string Gender,
-    Guid CafeId
+    Guid CafeId,
+    string? Avatar = null
 ) : IRequest<string>;

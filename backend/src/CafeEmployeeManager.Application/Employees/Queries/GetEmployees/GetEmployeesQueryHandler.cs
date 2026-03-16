@@ -37,7 +37,8 @@ public class GetEmployeesQueryHandler : IRequestHandler<GetEmployeesQuery, List<
                 DaysWorked = e.EmployeeCafe != null 
                     ? (int)(DateTime.UtcNow - e.EmployeeCafe.StartDate).TotalDays 
                     : 0,
-                Cafe = e.EmployeeCafe != null ? e.EmployeeCafe.Cafe.Name : null
+                Cafe = e.EmployeeCafe != null ? e.EmployeeCafe.Cafe.Name : null,
+                Avatar = e.Avatar
             })
             .OrderByDescending(e => e.DaysWorked)
             .ToListAsync(cancellationToken);

@@ -7,6 +7,7 @@ public class Employee
     public string EmailAddress { get; set; } = default!;
     public string PhoneNumber { get; set; } = default!;
     public string Gender { get; set; } = default!;
+    public string? Avatar { get; set; } // Base64-encoded image
 
     public EmployeeCafe? EmployeeCafe { get; set; }
 }
