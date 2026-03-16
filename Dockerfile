@@ -1,6 +1,10 @@
 # Build frontend
+# Force rebuild
 FROM node:22-alpine AS frontend-build
 WORKDIR /app
+
+ARG BUILD_DATE=unknown
+RUN echo "Build date: $BUILD_DATE"
 
 COPY frontend/package*.json ./
 RUN npm ci
