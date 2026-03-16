@@ -27,17 +27,26 @@ export function CafeFormModal({ open, loading, title, initialValues, onCancel, o
   const [logoBase64, setLogoBase64] = useState<string | undefined>()
 
   useEffect(() => {
-    if (!open) {
-      return
+    if (open) {
+      if (initialValues) {
+        form.setFieldsValue({
+          name: initialValues.name ?? '',
+          description: initialValues.description ?? '',
+          location: initialValues.location ?? '',
+        })
+        // Use a microtask to set state after form update
+        Promise.resolve().then(() => {
+          setLogoBase64(initialValues.logo ?? undefined)
+        })
+      } else {
+        form.resetFields()
+        Promise.resolve().then(() => {
+          setLogoBase64(undefined)
+        })
+      }
     }
-
-    form.setFieldsValue({
-      name: initialValues?.name ?? '',
-      description: initialValues?.description ?? '',
-      location: initialValues?.location ?? '',
-    })
-    setLogoBase64(initialValues?.logo ?? undefined)
-  }, [form, initialValues, open])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, initialValues?.id])
 
   const handleFileChange = (file: File) => {
     // Validate file size
