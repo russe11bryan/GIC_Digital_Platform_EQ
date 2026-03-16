@@ -53,6 +53,7 @@ export function CafeFormModal({ open, loading, title, initialValues, onCancel, o
 
   return (
     <Modal
+      key={initialValues?.id ?? 'create-cafe'}
       open={open}
       destroyOnHidden
       title={title}

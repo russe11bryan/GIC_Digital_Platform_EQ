@@ -1,5 +1,5 @@
 import { Button, Form, Modal, Radio, Select, Space } from 'antd'
-import { useEffect } from 'react'
+import { useMemo } from 'react'
 import { FormTextField } from './FormTextField'
 import type { Cafe, CreateEmployeePayload, UpdateEmployeePayload } from '../types/models'
 
@@ -23,20 +23,18 @@ type Props = {
 
 export function EmployeeFormModal({ cafes, open, loading, title, initialValues, onCancel, onSubmit }: Props) {
   const [form] = Form.useForm<EmployeeFormValues>()
-
-  useEffect(() => {
-    if (!open) {
-      return
-    }
-
-    form.setFieldsValue({
+  const selectedGender = Form.useWatch('gender', form)
+  const selectedCafeId = Form.useWatch('cafeId', form)
+  const formValues = useMemo(
+    () => ({
       name: initialValues?.name ?? '',
       emailAddress: initialValues?.emailAddress ?? '',
       phoneNumber: initialValues?.phoneNumber ?? '',
       gender: initialValues?.gender ?? undefined,
       cafeId: initialValues?.cafeId ?? undefined,
-    })
-  }, [form, initialValues, open])
+    }),
+    [initialValues],
+  )
 
   const handleSubmit = async () => {
     const values = await form.validateFields()
@@ -54,10 +52,21 @@ export function EmployeeFormModal({ cafes, open, loading, title, initialValues, 
 
   return (
     <Modal
+      key={initialValues?.id ?? 'create-employee'}
       open={open}
       destroyOnHidden
       title={title}
       onCancel={onCancel}
+      afterOpenChange={(isOpen) => {
+        if (!isOpen) {
+          return
+        }
+
+        form.resetFields()
+        queueMicrotask(() => {
+          form.setFieldsValue(formValues)
+        })
+      }}
       footer={[
         <Space key="footer">
           <Button onClick={onCancel}>Cancel</Button>
@@ -67,7 +76,7 @@ export function EmployeeFormModal({ cafes, open, loading, title, initialValues, 
         </Space>,
       ]}
     >
-      <Form form={form} layout="vertical">
+      <Form form={form} layout="vertical" initialValues={formValues} preserve={false}>
         <FormTextField
           label="Name"
           name="name"
@@ -94,7 +103,10 @@ export function EmployeeFormModal({ cafes, open, loading, title, initialValues, 
         />
 
         <Form.Item label="Gender" name="gender" rules={[{ required: true, message: 'Gender is required' }]}>
-          <Radio.Group>
+          <Radio.Group
+            value={selectedGender}
+            onChange={(event) => form.setFieldValue('gender', event.target.value)}
+          >
             <Radio value="Male">Male</Radio>
             <Radio value="Female">Female</Radio>
           </Radio.Group>
@@ -102,10 +114,12 @@ export function EmployeeFormModal({ cafes, open, loading, title, initialValues, 
 
         <Form.Item label="Assigned Cafe" name="cafeId" rules={[{ required: true, message: 'Assigned cafe is required' }]}>
           <Select
+            value={selectedCafeId}
             placeholder="Select a cafe"
             options={cafes.map((cafe) => ({ value: cafe.id, label: cafe.name }))}
             showSearch
             optionFilterProp="label"
+            onChange={(value) => form.setFieldValue('cafeId', value)}
           />
         </Form.Item>
       </Form>

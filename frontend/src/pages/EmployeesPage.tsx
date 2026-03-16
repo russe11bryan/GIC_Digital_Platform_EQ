@@ -150,7 +150,7 @@ export function EmployeesPage() {
   )
 
   return (
-    <Space className="page-wrap" direction="vertical" size={16} style={{ width: '100%' }}>
+    <Space className="page-wrap page-wrap-bottom-table" direction="vertical" size={16} style={{ width: '100%' }}>
       <Typography.Title className="page-title" level={3} style={{ margin: 0 }}>
         Employees
       </Typography.Title>
@@ -216,7 +216,7 @@ export function EmployeesPage() {
           </div>
         ) : (
           <div className="grid-shell">
-            <div className="ag-theme-alpine" style={{ height: 460, width: '100%' }}>
+            <div className="ag-theme-alpine grid-fill-height" style={{ width: '100%' }}>
               <AgGridReact<Employee>
                 rowData={filteredEmployees}
                 columnDefs={columnDefs}

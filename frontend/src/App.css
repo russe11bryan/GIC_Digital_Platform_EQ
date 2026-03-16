@@ -108,6 +108,15 @@
   width: 100%;
 }
 
+.page-wrap-bottom-table {
+  min-height: calc(100vh - 48px);
+  display: flex;
+}
+
+.page-wrap-bottom-table .grid-card {
+  margin-top: auto;
+}
+
 .page-title.ant-typography {
   margin-bottom: 0;
   color: #0f172a;
@@ -231,6 +240,12 @@
   border-radius: 0;
   overflow: hidden;
   background: #ffffff;
+  min-height: 60vh;
+}
+
+.grid-fill-height {
+  height: calc(100vh - 240px);
+  min-height: 520px;
 }
 
 .ag-theme-alpine {

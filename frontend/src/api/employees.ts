@@ -14,7 +14,7 @@ export async function createEmployee(payload: CreateEmployeePayload): Promise<st
 }
 
 export async function updateEmployee(payload: UpdateEmployeePayload): Promise<void> {
-  await apiClient.put('/employees', payload)
+  await apiClient.put(`/employees/${payload.id}`, payload)
 }
 
 export async function deleteEmployee(id: string): Promise<void> {
