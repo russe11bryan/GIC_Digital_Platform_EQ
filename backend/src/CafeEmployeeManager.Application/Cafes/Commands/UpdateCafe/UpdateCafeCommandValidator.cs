@@ -11,7 +11,7 @@ public class UpdateCafeCommandValidator : AbstractValidator<UpdateCafeCommand>
 
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Name is required")
-            .Length(6, 10).WithMessage("Name must be between 6 and 10 characters");
+            .Length(1, 100).WithMessage("Name must be between 1 and 100 characters");
 
         RuleFor(x => x.Description)
             .NotEmpty().WithMessage("Description is required")
@@ -21,7 +21,7 @@ public class UpdateCafeCommandValidator : AbstractValidator<UpdateCafeCommand>
             .NotEmpty().WithMessage("Location is required");
 
         RuleFor(x => x.Logo)
-            .MaximumLength(2097152).WithMessage("Logo must not exceed 2MB")
+            .MaximumLength(5242880).WithMessage("Logo must not exceed 5MB")
             .When(x => !string.IsNullOrEmpty(x.Logo));
     }
 }

@@ -142,7 +142,7 @@ export function CafeFormPage() {
           label="Name"
           name="name"
           placeholder="Enter cafe name"
-          rules={[{ required: true }, { min: 6, max: 10, message: 'Name must be 6-10 characters' }]}
+          rules={[{ required: true }, { max: 100, message: 'Name must be 100 characters or fewer' }]}
         />
 
         <FormTextField
@@ -153,15 +153,16 @@ export function CafeFormPage() {
           rules={[{ required: true }, { max: 256, message: 'Description must be 256 characters or fewer' }]}
         />
 
-        <ImageUploadField
-          label="Logo"
-          value={logoValue}
-          emptyText="Upload logo (max 2MB)"
-          previewAlt="Cafe logo preview"
-          onChange={(value) => {
-            form.setFieldValue('logo', value)
-          }}
-        />
+        <Form.Item label="Logo" name="logo">
+          <ImageUploadField
+            value={logoValue}
+            emptyText="Upload logo (max 2MB)"
+            previewAlt="Cafe logo preview"
+            onChange={(value) => {
+              form.setFieldValue('logo', value)
+            }}
+          />
+        </Form.Item>
 
         <FormTextField
           label="Location"

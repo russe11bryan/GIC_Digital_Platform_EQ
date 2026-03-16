@@ -205,7 +205,7 @@ export function EmployeeFormPage() {
           label="Name"
           name="name"
           placeholder="Enter employee name"
-          rules={[{ required: true }, { min: 6, max: 10, message: 'Name must be 6-10 characters' }]}
+          rules={[{ required: true }, { max: 100, message: 'Name must be 100 characters or fewer' }]}
         />
 
         <FormTextField

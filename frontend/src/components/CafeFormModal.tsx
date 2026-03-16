@@ -1,13 +1,12 @@
-import { Button, Form, Modal, Space } from 'antd'
-import { useEffect } from 'react'
+import { Button, Form, Modal, Space, Upload, message } from 'antd'
+import { UploadOutlined } from '@ant-design/icons'
+import { useEffect, useState } from 'react'
 import { FormTextField } from './FormTextField'
-import { ImageUploadField } from './ImageUploadField'
 import type { CreateCafePayload, UpdateCafePayload } from '../types/models'
 
 type CafeFormValues = {
   name: string
   description: string
-  logo?: string
   location: string
 }
 
@@ -20,9 +19,12 @@ type Props = {
   onSubmit: (payload: CreateCafePayload | UpdateCafePayload) => Promise<void>
 }
 
+const MAX_FILE_SIZE = 2 * 1024 * 1024 // 2MB
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+
 export function CafeFormModal({ open, loading, title, initialValues, onCancel, onSubmit }: Props) {
   const [form] = Form.useForm<CafeFormValues>()
-  const logoValue = Form.useWatch('logo', form)
+  const [logoBase64, setLogoBase64] = useState<string | undefined>()
 
   useEffect(() => {
     if (!open) {
@@ -33,9 +35,33 @@ export function CafeFormModal({ open, loading, title, initialValues, onCancel, o
       name: initialValues?.name ?? '',
       description: initialValues?.description ?? '',
       location: initialValues?.location ?? '',
-      logo: initialValues?.logo ?? undefined,
     })
+    setLogoBase64(initialValues?.logo ?? undefined)
   }, [form, initialValues, open])
+
+  const handleFileChange = (file: File) => {
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      message.error('File size must be less than 2MB')
+      return false
+    }
+
+    // Validate file type
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      message.error('Only image files (JPG, PNG, GIF, WebP) are allowed')
+      return false
+    }
+
+    // Convert to base64
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const base64String = e.target?.result as string
+      setLogoBase64(base64String)
+    }
+    reader.readAsDataURL(file)
+
+    return false // Prevent automatic upload
+  }
 
   const handleSubmit = async () => {
     const values = await form.validateFields()
@@ -44,11 +70,15 @@ export function CafeFormModal({ open, loading, title, initialValues, onCancel, o
       await onSubmit({
         id: initialValues.id,
         ...values,
+        logo: logoBase64,
       })
       return
     }
 
-    await onSubmit(values)
+    await onSubmit({
+      ...values,
+      logo: logoBase64,
+    })
   }
 
   return (
@@ -72,7 +102,7 @@ export function CafeFormModal({ open, loading, title, initialValues, onCancel, o
           label="Name"
           name="name"
           placeholder="Enter cafe name"
-          rules={[{ required: true }, { min: 6, max: 10, message: 'Name must be 6-10 characters' }]}
+          rules={[{ required: true }, { max: 100, message: 'Name must be 100 characters or fewer' }]}
         />
 
         <FormTextField
@@ -83,13 +113,37 @@ export function CafeFormModal({ open, loading, title, initialValues, onCancel, o
           rules={[{ required: true }, { max: 256, message: 'Description must be 256 characters or fewer' }]}
         />
 
-        <ImageUploadField
-          label="Logo"
-          value={logoValue}
-          emptyText="Upload logo (max 2MB)"
-          previewAlt="Cafe logo preview"
-          onChange={(value) => form.setFieldValue('logo', value)}
-        />
+        <Form.Item label="Logo">
+          <Upload
+            maxCount={1}
+            beforeUpload={handleFileChange}
+            accept="image/*"
+            listType="picture"
+            showUploadList={false}
+          >
+            <div style={{ 
+              padding: '16px', 
+              border: '1px dashed #d9d9d9', 
+              borderRadius: '6px',
+              cursor: 'pointer',
+              textAlign: 'center',
+              background: logoBase64 ? '#fafafa' : undefined
+            }}>
+              {logoBase64 ? (
+                <>
+                  <img src={logoBase64} alt="Logo preview" style={{ maxWidth: '100%', maxHeight: '120px', marginBottom: '8px' }} />
+                  <div style={{ fontSize: '12px', color: '#666' }}>Click to change logo</div>
+                </>
+              ) : (
+                <>
+                  <UploadOutlined style={{ fontSize: '24px', marginBottom: '8px', display: 'block' }} />
+                  <div>Click to upload logo (max 2MB)</div>
+                  <div style={{ fontSize: '12px', color: '#999' }}>Supported: JPG, PNG, GIF, WebP</div>
+                </>
+              )}
+            </div>
+          </Upload>
+        </Form.Item>
 
         <FormTextField
           label="Location"

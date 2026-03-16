@@ -8,7 +8,7 @@ public class CreateEmployeeCommandValidator : AbstractValidator<CreateEmployeeCo
     {
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Name is required")
-            .Length(6, 10).WithMessage("Name must be between 6 and 10 characters");
+            .Length(1, 100).WithMessage("Name must be between 1 and 100 characters");
 
         RuleFor(x => x.EmailAddress)
             .NotEmpty().WithMessage("Email is required")
