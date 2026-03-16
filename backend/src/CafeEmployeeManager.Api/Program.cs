@@ -13,13 +13,36 @@ async Task BuildAndRunApp()
 
     // Handle Railway DATABASE_URL environment variable
     var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+    Console.WriteLine($"DATABASE_URL present: {!string.IsNullOrEmpty(databaseUrl)}");
+    
     if (!string.IsNullOrEmpty(databaseUrl))
     {
-        // Convert postgres:// URL to connection string
-        var uri = new Uri(databaseUrl);
-        var connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.LocalPath.TrimStart('/')};Username={uri.UserInfo.Split(':')[0]};Password={uri.UserInfo.Split(':')[1]};SSL Mode=Require;Trust Server Certificate=true;";
-        builder.Configuration["ConnectionStrings:DefaultConnection"] = connectionString;
-        Console.WriteLine("Database connection configured from DATABASE_URL");
+        try
+        {
+            // Convert postgres:// or postgresql:// URL to connection string
+            var uri = new Uri(databaseUrl);
+            var userInfo = uri.UserInfo.Split(':');
+            var username = userInfo[0];
+            var password = userInfo.Length > 1 ? userInfo[1] : "";
+            var host = uri.Host;
+            var port = uri.Port > 0 ? uri.Port : 5432;
+            var database = uri.LocalPath.TrimStart('/');
+            
+            var connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true;";
+            
+            builder.Configuration["ConnectionStrings:DefaultConnection"] = connectionString;
+            Console.WriteLine($"Database connection configured: Host={host}, Port={port}, Database={database}");
+            Console.WriteLine("CONNECTION STRING SET SUCCESSFULLY");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ERROR parsing DATABASE_URL: {ex.Message}");
+            throw;
+        }
+    }
+    else
+    {
+        Console.WriteLine("WARNING: DATABASE_URL not set - database features may not work");
     }
 
     const string FrontendCorsPolicy = "FrontendCorsPolicy";
