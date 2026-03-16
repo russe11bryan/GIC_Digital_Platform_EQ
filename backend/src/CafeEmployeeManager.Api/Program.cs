@@ -7,6 +7,17 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Handle Railway DATABASE_URL environment variable
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+if (!string.IsNullOrEmpty(databaseUrl))
+{
+    // Convert postgres:// URL to connection string
+    var uri = new Uri(databaseUrl);
+    var connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.LocalPath.TrimStart('/')};Username={uri.UserInfo.Split(':')[0]};Password={uri.UserInfo.Split(':')[1]};SSL Mode=Require;Trust Server Certificate=true;";
+    builder.Configuration["ConnectionStrings:DefaultConnection"] = connectionString;
+    Console.WriteLine("Database connection configured from DATABASE_URL");
+}
+
 const string FrontendCorsPolicy = "FrontendCorsPolicy";
 
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
