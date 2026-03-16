@@ -13,11 +13,14 @@ RUN npm run build
 # Final stage - serve frontend with nginx
 FROM nginx:1.27-alpine
 
+# Remove default nginx config
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Copy our nginx config
+COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+
 # Copy frontend build to nginx html directory
 COPY --from=frontend-build /app/dist /usr/share/nginx/html
-
-# Copy nginx config
-COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Verify files are present
 RUN ls -la /usr/share/nginx/html/ && test -f /usr/share/nginx/html/index.html
