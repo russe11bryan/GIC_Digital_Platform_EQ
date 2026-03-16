@@ -82,7 +82,7 @@ export function CafeFormPage() {
   )
 
   const hasUnsavedChanges = JSON.stringify(currentSnapshot) !== JSON.stringify(initialSnapshot)
-  useUnsavedChangesGuard(hasUnsavedChanges)
+  const confirmNavigation = useUnsavedChangesGuard(hasUnsavedChanges)
 
   const handleSubmit = async () => {
     const values = await form.validateFields()
@@ -174,7 +174,11 @@ export function CafeFormPage() {
           <Button type="primary" onClick={() => void handleSubmit()} loading={createCafeMutation.isPending || updateCafeMutation.isPending}>
             Submit
           </Button>
-          <Button onClick={() => navigate('/cafes')}>Cancel</Button>
+          <Button onClick={() => {
+            if (confirmNavigation()) {
+              navigate('/cafes')
+            }
+          }}>Cancel</Button>
         </Space>
       </Form>
     </Card>

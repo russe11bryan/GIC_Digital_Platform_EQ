@@ -1,9 +1,7 @@
-import { useEffect } from 'react'
-import { useBeforeUnload, useBlocker } from 'react-router-dom'
+import { useCallback } from 'react'
+import { useBeforeUnload } from 'react-router-dom'
 
 export function useUnsavedChangesGuard(hasUnsavedChanges: boolean) {
-  const blocker = useBlocker(hasUnsavedChanges)
-
   useBeforeUnload((event) => {
     if (!hasUnsavedChanges) {
       return
@@ -13,16 +11,11 @@ export function useUnsavedChangesGuard(hasUnsavedChanges: boolean) {
     event.returnValue = ''
   })
 
-  useEffect(() => {
-    if (blocker.state !== 'blocked') {
-      return
+  return useCallback(() => {
+    if (!hasUnsavedChanges) {
+      return true
     }
 
-    if (window.confirm('You have unsaved changes. Leave this page?')) {
-      blocker.proceed()
-      return
-    }
-
-    blocker.reset()
-  }, [blocker])
+    return window.confirm('You have unsaved changes. Leave this page?')
+  }, [hasUnsavedChanges])
 }

@@ -98,7 +98,7 @@ export function EmployeeFormPage() {
   )
 
   const hasUnsavedChanges = JSON.stringify(currentSnapshot) !== JSON.stringify(initialSnapshot)
-  useUnsavedChangesGuard(hasUnsavedChanges)
+  const confirmNavigation = useUnsavedChangesGuard(hasUnsavedChanges)
 
   const handleSubmit = async () => {
     const values = await form.validateFields()
@@ -203,7 +203,11 @@ export function EmployeeFormPage() {
           >
             Submit
           </Button>
-          <Button onClick={() => navigate('/employees')}>Cancel</Button>
+          <Button onClick={() => {
+            if (confirmNavigation()) {
+              navigate('/employees')
+            }
+          }}>Cancel</Button>
         </Space>
       </Form>
     </Card>

@@ -3,25 +3,18 @@ import { App, Alert, Button, Card, Empty, Input, Modal, Space, Spin, Tag, Typogr
 import type { ColDef } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import { useCallback, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { EmployeeFormModal } from '../components/EmployeeFormModal'
-import { useCafes } from '../hooks/useCafes'
-import { useCreateEmployee, useDeleteEmployee, useEmployees, useUpdateEmployee } from '../hooks/useEmployees'
-import type { CreateEmployeePayload, Employee, UpdateEmployeePayload } from '../types/models'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useDeleteEmployee, useEmployees } from '../hooks/useEmployees'
+import type { Employee } from '../types/models'
 import { getErrorMessage } from '../utils/getErrorMessage'
 
 export function EmployeesPage() {
   const { message } = App.useApp()
+  const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const [search, setSearch] = useState(searchParams.get('cafe') ?? '')
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
-  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null)
-  const [createOpen, setCreateOpen] = useState(false)
-  const [editOpen, setEditOpen] = useState(false)
-  const employeesQuery = useEmployees('')
-  const cafesQuery = useCafes('')
-  const createEmployeeMutation = useCreateEmployee()
-  const updateEmployeeMutation = useUpdateEmployee()
+  const [cafeInput, setCafeInput] = useState(searchParams.get('cafe') ?? '')
+  const cafeFilter = searchParams.get('cafe') ?? ''
+  const employeesQuery = useEmployees(cafeFilter)
   const deleteEmployeeMutation = useDeleteEmployee()
 
   const confirmDeleteEmployee = useCallback((employee: Employee) => {
@@ -34,38 +27,12 @@ export function EmployeesPage() {
         try {
           await deleteEmployeeMutation.mutateAsync(employee.id)
           message.success('Employee deleted successfully')
-          setSelectedEmployee((current) => (current?.id === employee.id ? null : current))
-          setEditingEmployee((current) => (current?.id === employee.id ? null : current))
         } catch (error) {
           message.error(getErrorMessage(error))
         }
       },
     })
   }, [deleteEmployeeMutation, message])
-
-  const filteredEmployees = useMemo(() => {
-    const term = search.trim().toLowerCase()
-    if (!term) {
-      return employeesQuery.data ?? []
-    }
-
-    return (employeesQuery.data ?? []).filter(
-      (employee) =>
-        employee.id.toLowerCase().includes(term) ||
-        employee.name.toLowerCase().includes(term) ||
-        employee.emailAddress.toLowerCase().includes(term) ||
-        employee.phoneNumber.toLowerCase().includes(term) ||
-        (employee.cafe ?? '').toLowerCase().includes(term),
-    )
-  }, [employeesQuery.data, search])
-
-  const cafeIdByName = useMemo(() => {
-    const map = new Map<string, string>()
-    for (const cafe of cafesQuery.data ?? []) {
-      map.set(cafe.name, cafe.id)
-    }
-    return map
-  }, [cafesQuery.data])
 
   const columnDefs = useMemo<ColDef<Employee>[]>(
     () => [
@@ -129,9 +96,7 @@ export function EmployeesPage() {
             <Space size={8}>
               <Button size="small" onClick={(event) => {
                 event.stopPropagation()
-                setSelectedEmployee(data)
-                setEditingEmployee(data)
-                setEditOpen(true)
+                navigate(`/employees/${data.id}/edit`)
               }}>
                 Edit
               </Button>
@@ -146,7 +111,7 @@ export function EmployeesPage() {
         ),
       },
     ],
-    [confirmDeleteEmployee],
+    [confirmDeleteEmployee, navigate],
   )
 
   return (
@@ -160,36 +125,33 @@ export function EmployeesPage() {
           <Input
             className="pill-search"
             prefix={<SearchOutlined />}
-            placeholder="Search anything on Employees"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Filter by cafe"
+            value={cafeInput}
+            onChange={(e) => setCafeInput(e.target.value)}
             allowClear
           />
+          <Button
+            type="primary"
+            onClick={() => {
+              const value = cafeInput.trim()
+              navigate(value ? `/employees?cafe=${encodeURIComponent(value)}` : '/employees')
+            }}
+          >
+            Apply Filter
+          </Button>
+          <Button onClick={() => {
+            setCafeInput('')
+            navigate('/employees')
+          }}>
+            Clear
+          </Button>
           <Button onClick={() => void employeesQuery.refetch()} loading={employeesQuery.isFetching && !employeesQuery.isLoading}>
             Refresh
           </Button>
           <Button
-            disabled={!selectedEmployee}
-            onClick={() => {
-              setEditingEmployee(selectedEmployee)
-              setEditOpen(true)
-            }}
-          >
-            Edit Selected
-          </Button>
-          <Button danger disabled={!selectedEmployee} onClick={() => {
-            if (!selectedEmployee) {
-              return
-            }
-
-            confirmDeleteEmployee(selectedEmployee)
-          }}>
-            Delete Selected
-          </Button>
-          <Button
             type="primary"
             icon={<PlusOutlined />}
-            onClick={() => setCreateOpen(true)}
+            onClick={() => navigate('/employees/new')}
           >
             Add New Employee
           </Button>
@@ -218,81 +180,19 @@ export function EmployeesPage() {
           <div className="grid-shell">
             <div className="ag-theme-alpine grid-fill-height" style={{ width: '100%' }}>
               <AgGridReact<Employee>
-                rowData={filteredEmployees}
+                rowData={employeesQuery.data ?? []}
                 columnDefs={columnDefs}
                 rowHeight={64}
                 defaultColDef={{
                   resizable: true,
                 }}
-                rowSelection="single"
                 suppressCellFocus
                 loading={employeesQuery.isFetching}
-                onRowClicked={(event) => {
-                  const clickedEmployee = event.data ?? null
-                  setSelectedEmployee((previousEmployee) => {
-                    if (previousEmployee?.id === clickedEmployee?.id) {
-                      event.node.setSelected(false)
-                      return null
-                    }
-
-                    return clickedEmployee
-                  })
-                }}
               />
             </div>
           </div>
         )}
       </Card>
-
-      <EmployeeFormModal
-        cafes={cafesQuery.data ?? []}
-        open={createOpen}
-        loading={createEmployeeMutation.isPending}
-        title="Add New Employee"
-        onCancel={() => setCreateOpen(false)}
-        onSubmit={async (payload: CreateEmployeePayload | UpdateEmployeePayload) => {
-          try {
-            await createEmployeeMutation.mutateAsync(payload as CreateEmployeePayload)
-            message.success('Employee created successfully')
-            setCreateOpen(false)
-          } catch (error) {
-            message.error(getErrorMessage(error))
-          }
-        }}
-      />
-
-      <EmployeeFormModal
-        cafes={cafesQuery.data ?? []}
-        open={editOpen}
-        loading={updateEmployeeMutation.isPending}
-        title="Edit Employee"
-        initialValues={
-          editingEmployee
-            ? {
-                id: editingEmployee.id,
-                name: editingEmployee.name,
-                emailAddress: editingEmployee.emailAddress,
-                phoneNumber: editingEmployee.phoneNumber,
-                gender: editingEmployee.gender,
-                cafeId: editingEmployee.cafeId ?? (editingEmployee.cafe ? cafeIdByName.get(editingEmployee.cafe) : undefined),
-              }
-            : undefined
-        }
-        onCancel={() => {
-          setEditOpen(false)
-          setEditingEmployee(null)
-        }}
-        onSubmit={async (payload: CreateEmployeePayload | UpdateEmployeePayload) => {
-          try {
-            await updateEmployeeMutation.mutateAsync(payload as UpdateEmployeePayload)
-            message.success('Employee updated successfully')
-            setEditOpen(false)
-            setEditingEmployee(null)
-          } catch (error) {
-            message.error(getErrorMessage(error))
-          }
-        }}
-      />
     </Space>
   )
 }

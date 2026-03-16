@@ -167,7 +167,7 @@ Creates a new café.
 
 ### Update Cafe
 
-PUT/cafes
+PUT/cafes/{id}
 
 Updates an existing café.
 
@@ -175,7 +175,7 @@ Updates an existing café.
 
 ### Delete Cafe
 
-DELETE/cafes
+DELETE/cafes/{id}
 
 Deletes the café and all employees assigned to it.
 
@@ -209,7 +209,7 @@ days_worked = current_date - start_date
 
 ### Create Employee
 
-GET/employees
+POST/employees
 
 Creates a new employee and assigns them to a café.
 
@@ -217,7 +217,7 @@ Creates a new employee and assigns them to a café.
 
 ### Update Employee
 
-PUT/employees
+PUT/employees/{id}
 
 
 Updates employee information and café assignment.
@@ -226,7 +226,7 @@ Updates employee information and café assignment.
 
 ### Delete Employee
 
-DELETE/employees
+DELETE/employees/{id}
 
 Deletes an employee.
 
@@ -255,19 +255,14 @@ cd backend
 
 docker compose up -d
 
-### Create database migration:
+### Restore and run the API:
 
-dotnet ef migrations add InitialCreate
---project src/CafeEmployeeManager.Infrastructure
---startup-project src/CafeEmployeeManager.Api
-
-### Run the API:
-
+dotnet restore CafeEmployeeManager.slnx
 dotnet run --project src/CafeEmployeeManager.Api
 
 ### Swagger will be available at:
 
-http://localhost:5000/swagger
+http://localhost:5068/swagger
 
 ---
 
@@ -327,10 +322,11 @@ To stop all services:
 - Assign employees to cafés
 - Filter cafés by location
 - View employees under a café
-- Add / edit cafés
-- Add / edit employees
+- Add / edit cafés on dedicated pages
+- Add / edit employees on dedicated pages
 - Delete records with confirmation
 - Form validation
+- Unsaved changes warning on add/edit pages
 
 ---
 
@@ -347,7 +343,7 @@ Displays cafés in a table with:
 - Location
 - Edit/Delete actions
 
-Clicking employees navigates to employee page.
+Clicking the employees count navigates to the employee page filtered by café.
 
 ---
 
@@ -373,6 +369,8 @@ Form validation:
 - Description: max 256 characters
 - Logo: max 2MB
 - Location required
+- Cancel returns to the cafes list
+- Leaving with unsaved changes prompts for confirmation
 
 ---
 
@@ -385,6 +383,8 @@ Validation:
 - Singapore phone number (starts with 8 or 9)
 - Gender required
 - Café selection required
+- Cancel returns to the employees list
+- Leaving with unsaved changes prompts for confirmation
 
 ---
 
@@ -407,12 +407,9 @@ Checks included:
 
 ---
 
-# Future Improvements
+# Submission Note
 
-- Authentication and authorization
-- Image upload for café logos
-- Pagination for large datasets
-- Unit and integration tests
+The assignment also asks for a hosted application URL. This repository currently includes local and Docker run instructions only. Deploying the app and adding the hosted URL is still a manual submission step.
 
 ---
 
