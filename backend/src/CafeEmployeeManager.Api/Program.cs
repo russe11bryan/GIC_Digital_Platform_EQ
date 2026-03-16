@@ -16,14 +16,25 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
+    var allowedOrigins = new List<string>
+    {
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:4173",
+        "http://127.0.0.1:4173"
+    };
+
+    // Add Vercel frontend URL if it exists in environment
+    var vercelUrl = Environment.GetEnvironmentVariable("VERCEL_URL");
+    if (!string.IsNullOrEmpty(vercelUrl))
+    {
+        allowedOrigins.Add($"https://{vercelUrl}");
+    }
+
     options.AddPolicy(FrontendCorsPolicy, policy =>
     {
         policy
-            .WithOrigins(
-                "http://localhost:5173",
-                "http://127.0.0.1:5173",
-                "http://localhost:4173",
-                "http://127.0.0.1:4173")
+            .WithOrigins(allowedOrigins.ToArray())
             .AllowAnyHeader()
             .AllowAnyMethod();
     });

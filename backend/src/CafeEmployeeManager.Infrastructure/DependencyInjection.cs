@@ -12,8 +12,13 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+        var connectionString = !string.IsNullOrEmpty(databaseUrl)
+            ? databaseUrl
+            : configuration.GetConnectionString("DefaultConnection");
+
         services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(connectionString));
 
         services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
 
