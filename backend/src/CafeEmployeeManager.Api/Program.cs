@@ -51,13 +51,13 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
     {
+        Console.WriteLine("Starting database migration...");
+        await dbContext.Database.MigrateAsync();
+        Console.WriteLine("Database migration completed.");
+        
         Console.WriteLine("Starting database initialization...");
         
-        // Create database and schema from DbContext model
-        var dbCreated = dbContext.Database.EnsureCreated();
-        Console.WriteLine($"Database schema: {(dbCreated ? "created" : "already exists")}");
-        
-        // Seed initial data
+        // Seed initial data if needed
         Console.WriteLine("Starting database seeding...");
         SeedData.InitializeAsync(dbContext).GetAwaiter().GetResult();
         Console.WriteLine("Database initialization completed successfully.");
