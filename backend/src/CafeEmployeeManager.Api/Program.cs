@@ -78,16 +78,40 @@ async Task BuildAndRunApp()
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                 Console.WriteLine("Starting database initialization...");
+                Console.WriteLine($"Database connection string configured: {(databaseUrl != null ? "Yes" : "No")}");
                 
-                // Apply migrations
-                Console.WriteLine("Applying database migrations...");
-                await dbContext.Database.MigrateAsync();
-                Console.WriteLine("Database migrations applied successfully.");
-                
-                // Seed initial data
-                Console.WriteLine("Starting database seeding...");
-                await SeedData.InitializeAsync(dbContext);
-                Console.WriteLine("Database initialization completed successfully.");
+                try
+                {
+                    // Test connection
+                    var canConnect = await dbContext.Database.CanConnectAsync();
+                    Console.WriteLine($"Database connection test: {(canConnect ? "SUCCESS" : "FAILED")}");
+                    
+                    if (canConnect)
+                    {
+                        // Apply migrations
+                        Console.WriteLine("Applying database migrations...");
+                        var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
+                        Console.WriteLine($"Pending migrations: {string.Join(", ", pendingMigrations) ?? "None"}");
+                        
+                        await dbContext.Database.MigrateAsync();
+                        Console.WriteLine("Database migrations applied successfully.");
+                        
+                        // Seed initial data
+                        Console.WriteLine("Starting database seeding...");
+                        await SeedData.InitializeAsync(dbContext);
+                        Console.WriteLine("Database initialization completed successfully.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("ERROR: Could not connect to database");
+                    }
+                }
+                catch (Exception migrationEx)
+                {
+                    Console.WriteLine($"Migration error: {migrationEx.Message}");
+                    Console.WriteLine($"Stack trace: {migrationEx.StackTrace}");
+                    throw;
+                }
             }
         }
         else
