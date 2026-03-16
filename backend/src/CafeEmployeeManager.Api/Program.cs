@@ -79,6 +79,9 @@ app.UseCors(FrontendCorsPolicy);
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+// Add health check endpoint
+app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
+
 app.UseHttpsRedirection();
 app.MapControllers();
 
