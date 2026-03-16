@@ -17,6 +17,9 @@ RUN npm run build
 # Final stage - serve frontend with nginx
 FROM nginx:1.27-alpine
 
+# Install curl for healthcheck
+RUN apk add --no-cache curl
+
 # Remove default nginx config
 RUN rm /etc/nginx/conf.d/default.conf
 
@@ -31,7 +34,7 @@ RUN ls -la /usr/share/nginx/html/ && test -f /usr/share/nginx/html/index.html
 
 EXPOSE 80
 
-HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=5 \
   CMD curl -f http://localhost/health || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]
