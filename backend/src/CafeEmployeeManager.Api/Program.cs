@@ -58,7 +58,24 @@ async Task BuildAndRunApp()
 
     builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 
-    builder.Services.AddControllers();
+    builder.Services.AddControllers()
+        .ConfigureApiBehaviorOptions(options =>
+        {
+            options.InvalidModelStateResponseFactory = context =>
+            {
+                var errors = context.ModelState
+                    .Where(e => e.Value?.Errors.Count > 0)
+                    .SelectMany(e => e.Value!.Errors.Select(err => new { field = e.Key, message = err.ErrorMessage }))
+                    .ToList();
+                
+                return new BadRequestObjectResult(new
+                {
+                    message = "Validation failed",
+                    errors = errors
+                });
+            };
+        });
+    
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
     builder.Services.AddCors(options =>
