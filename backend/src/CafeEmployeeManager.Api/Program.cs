@@ -3,6 +3,7 @@ using CafeEmployeeManager.Api.Middleware;
 using CafeEmployeeManager.Application;
 using CafeEmployeeManager.Infrastructure;
 using CafeEmployeeManager.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 try
