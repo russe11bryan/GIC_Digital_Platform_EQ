@@ -70,7 +70,8 @@ async Task BuildAndRunApp()
             "http://localhost:4173",
             "http://127.0.0.1:4173",
             "http://localhost:3000",
-            "http://localhost:80"
+            "http://localhost:80",
+            "https://gicdigitalplatformeq-production.up.railway.app"
         };
 
         // Add Vercel frontend URL if it exists in environment
