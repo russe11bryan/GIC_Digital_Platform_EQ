@@ -30,8 +30,12 @@ COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 # Copy frontend build to nginx html directory
 COPY --from=frontend-build /app/dist /usr/share/nginx/html
 
-# Verify files are present
-RUN ls -la /usr/share/nginx/html/ && test -f /usr/share/nginx/html/index.html
+# Debug: verify files are present
+RUN echo "=== Checking dist files ===" && \
+    ls -la /usr/share/nginx/html/ && \
+    test -f /usr/share/nginx/html/index.html && \
+    echo "=== index.html found ===" || \
+    echo "=== ERROR: index.html NOT found ==="
 
 EXPOSE 80
 
