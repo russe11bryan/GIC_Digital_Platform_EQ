@@ -9,9 +9,8 @@ COPY frontend/ .
 
 # Build with API base URL - use arg with default fallback
 ARG VITE_API_BASE_URL=https://gic-backend-production.up.railway.app/api
-ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 
-RUN npm run build
+RUN VITE_API_BASE_URL=${VITE_API_BASE_URL} npm run build
 
 # Final stage - serve frontend with nginx
 FROM nginx:1.27-alpine
