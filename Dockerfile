@@ -2,6 +2,9 @@
 FROM node:22-alpine AS frontend-build
 WORKDIR /app
 
+# Cache bust - force fresh build
+ENV BUILD_ID="2026-03-17-fix-api-url"
+
 COPY frontend/package*.json ./
 RUN npm ci
 
